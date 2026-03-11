@@ -185,6 +185,11 @@
   },
   "active": "1a2ebbe5c83096a3",
   "lastOpenFiles": [
+    "Planned/Advanced UI Features.tmp",
+    "Planned/Instructor Features.tmp",
+    "Planned/LocalStorage Persistence.tmp",
+    "Planned/Multi-Student Support.tmp",
+    "Planned/Routing and Navigation.tmp",
     "Domain Model.md",
     "Coding standards.md",
     "Wiki content standards.md",
@@ -203,13 +208,9 @@
     "basic-memory/Planned/LocalStorage Persistence.tmp",
     "basic-memory/Planned/WPM and Timing Metrics.tmp",
     "basic-memory/Planned/Multi-Student Support.tmp",
-    "Planned",
     "basic-memory/Data Model.md",
-    "basic-memory/MVP Scope.tmp",
     "basic-memory/Tooling.md",
-    "basic-memory/Tooling.tmp",
     "basic-memory/UI Components.md",
-    "basic-memory/UI Components.tmp",
     "basic-memory/User Flows.md",
     "Home.md"
   ]
