@@ -1,7 +1,12 @@
+<!--
+  App.svelte - Main orchestrator for a typing practice session.
+  Manages the learner's journey through a set of practice lines, enforcing
+  the pedagogical constraint that mistakes cannot be corrected mid-line.
+-->
 <script lang="ts">
   import TypingArea from './ui/components/TypingArea.svelte';
 
-  // Hardcoded text lines for MVP
+  // Practice content - hardcoded for MVP, will be configurable later
   const lines: string[] = [
     'Der schnelle braune Fuchs springt über den faulen Hund.',
     'Übung macht den Meister.',
@@ -10,27 +15,28 @@
     'Jeder Experte war einmal ein Anfänger.',
   ];
 
-  // Application state
+  // Session State
+  // Tracks the learner's progress through the practice lines. Each line is
+  // attempted exactly once, and the session ends when all lines are completed.
   let currentLineIndex: number = 0;
   let typedText: string = '';
   let hasError: boolean = false;
   let attempts: boolean[] = [];
   let isComplete: boolean = false;
 
-  // Get current line
   $: currentLine = lines[currentLineIndex] || '';
 
-  // Handle keyboard input
+  // Input Processing
+  // Enforces the "no backspace" pedagogy: learners must commit to their
+  // keystrokes and cannot correct mistakes. This builds muscle memory and
+  // encourages careful, deliberate typing over fast, sloppy input.
   function handleKeyDown(event: KeyboardEvent): void {
-    // Prevent default behavior for all keys we handle
     if (event.key === 'Enter' || event.key === 'Backspace' || event.key.length === 1) {
       event.preventDefault();
     }
 
-    // If complete, ignore all input
     if (isComplete) return;
 
-    // Handle Enter key - advance to next line
     if (event.key === 'Enter') {
       if (hasError || typedText.length === currentLine.length) {
         recordAttempt();
@@ -39,22 +45,14 @@
       return;
     }
 
-    // Prevent backspace
-    if (event.key === 'Backspace') {
-      return;
-    }
+    // Backspace is intentionally disabled to enforce commitment
+    if (event.key === 'Backspace') return;
 
-    // Only process single character keys
-    if (event.key.length !== 1) {
-      return;
-    }
+    if (event.key.length !== 1) return;
 
-    // If already has error, ignore further input until Enter
-    if (hasError) {
-      return;
-    }
+    // Once an error occurs, the line is "locked" until Enter
+    if (hasError) return;
 
-    // Check if character is correct
     const expectedChar = currentLine[typedText.length];
     if (event.key === expectedChar) {
       typedText += event.key;
@@ -63,13 +61,14 @@
     }
   }
 
-  // Record the attempt result
+  // Progress Tracking
+  // Records success/failure for each line to provide meaningful feedback
+  // at session end. A line is successful only if completed without errors.
   function recordAttempt(): void {
     const success: boolean = !hasError && typedText.length === currentLine.length;
     attempts = [...attempts, success];
   }
 
-  // Advance to next line or complete
   function advanceToNextLine(): void {
     if (currentLineIndex < lines.length - 1) {
       currentLineIndex++;
@@ -80,12 +79,16 @@
     }
   }
 
-  // Calculate results
+  // Results Computation
+  // Provides immediate accuracy feedback to help learners gauge their
+  // performance and motivate improvement in subsequent sessions.
   $: successCount = attempts.filter((a) => a).length;
   $: failureCount = attempts.filter((a) => !a).length;
   $: accuracy = attempts.length > 0 ? Math.round((successCount / attempts.length) * 100) : 0;
 
-  // Restart the application
+  // Session Reset
+  // Allows learners to retry immediately without page reload, reducing
+  // friction and encouraging repeated practice.
   function restart(): void {
     currentLineIndex = 0;
     typedText = '';
