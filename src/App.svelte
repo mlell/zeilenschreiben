@@ -100,133 +100,38 @@
 
 <svelte:window on:keydown={handleKeyDown} />
 
-<main>
-  <h1>Zeilenschreiben</h1>
+<main class="max-w-5xl mx-auto p-8">
+  <h1 class="text-4xl mb-8 text-text font-normal">Zeilenschreiben</h1>
 
   {#if !isComplete}
-    <!-- Typing interface -->
     <TypingArea {lines} {currentLineIndex} {typedText} {hasError} {attempts} />
   {:else}
-    <!-- Results display -->
-    <div class="results">
-      <h2>Ergebnisse</h2>
+    <div class="mt-12">
+      <h2 class="text-xl mb-8 text-text font-normal">Ergebnisse</h2>
 
-      <div class="stats">
-        <div class="stat">
-          <div class="stat-value success">{successCount}</div>
-          <div class="stat-label">Erfolgreich</div>
+      <div class="flex justify-around my-8 gap-8">
+        <div class="flex-1 p-6 bg-surface-elevated rounded-md">
+          <div class="text-5xl font-bold mb-2 text-success">{successCount}</div>
+          <div class="text-base text-text-muted">Erfolgreich</div>
         </div>
 
-        <div class="stat">
-          <div class="stat-value failure">{failureCount}</div>
-          <div class="stat-label">Fehler</div>
+        <div class="flex-1 p-6 bg-surface-elevated rounded-md">
+          <div class="text-5xl font-bold mb-2 text-error">{failureCount}</div>
+          <div class="text-base text-text-muted">Fehler</div>
         </div>
 
-        <div class="stat">
-          <div class="stat-value accuracy">{accuracy}%</div>
-          <div class="stat-label">Genauigkeit</div>
+        <div class="flex-1 p-6 bg-surface-elevated rounded-md">
+          <div class="text-5xl font-bold mb-2 text-primary">{accuracy}%</div>
+          <div class="text-base text-text-muted">Genauigkeit</div>
         </div>
       </div>
 
-      <button on:click={restart}>Nochmal versuchen</button>
+      <button
+        class="mt-8 px-8 py-4 text-lg bg-primary text-white border-none rounded-md cursor-pointer transition-colors duration-300 hover:bg-primary-hover"
+        on:click={restart}
+      >
+        Nochmal versuchen
+      </button>
     </div>
   {/if}
 </main>
-
-<style>
-
-/* === Layout === */
-main {
-  /* Main container with max width and centered padding */
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: var(--spacing-lg);
-}
-
-.results {
-  /* Results section container with top margin */
-  margin-top: var(--spacing-xl);
-}
-
-.stats {
-  /* Horizontal layout for displaying statistics */
-  display: flex;
-  justify-content: space-around;
-  margin: var(--spacing-lg) 0;
-  gap: var(--spacing-lg);
-}
-
-.stat {
-  /* Individual stat card with adaptive background */
-  flex: 1;
-  padding: var(--spacing-md);
-  background-color: var(--color-card-bg);
-  border-radius: var(--border-radius);
-}
-
-/* === Typography === */
-h1 {
-  /* Main heading with large font size and adaptive color */
-  font-size: var(--font-size-xxl);
-  margin-bottom: var(--spacing-lg);
-  color: var(--color-heading);
-  font-weight: var(--font-weight-emphasis);
-}
-
-.results h2 {
-  /* Results section heading with adaptive color */
-  font-size: var(--font-size-xl);
-  margin-bottom: var(--spacing-lg);
-  color: var(--color-heading);
-  font-weight: var(--font-weight-emphasis);
-}
-
-.stat-value {
-  /* Large number display for statistics */
-  font-size: var(--font-size-huge);
-  font-weight: bold;
-  margin-bottom: var(--spacing-xs);
-}
-
-.stat-label {
-  /* Label text below stat values with adaptive color */
-  font-size: var(--font-size-base);
-  color: var(--color-body-text);
-  font-weight: var(--font-weight-emphasis);
-}
-
-/* === Results Stats === */
-.stat-value.success {
-  /* Green color for successful attempts */
-  color: var(--color-success);
-}
-
-.stat-value.failure {
-  /* Red color for failed attempts */
-  color: var(--color-error);
-}
-
-.stat-value.accuracy {
-  /* Blue color for accuracy percentage */
-  color: var(--color-primary);
-}
-
-/* === Interactive Elements === */
-button {
-  /* Restart button with primary color and hover effect */
-  margin-top: var(--spacing-lg);
-  padding: var(--spacing-sm) var(--spacing-lg);
-  font-size: var(--font-size-lg);
-  background-color: var(--color-primary);
-  color: white;
-  border: none;
-  border-radius: var(--border-radius);
-  cursor: pointer;
-  transition: background-color var(--transition-fast);
-}
-
-button:hover {
-  /* Darker shade on hover */
-  background-color: var(--color-primary-dark);
-}
-</style>

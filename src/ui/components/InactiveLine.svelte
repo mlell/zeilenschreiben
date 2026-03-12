@@ -3,11 +3,8 @@
   Past lines show completion status; future lines appear dimmed.
 -->
 <script lang="ts">
-  /**
-   * The text content to display
-   */
+  /** The text content to display */
   export let text: string;
-
   /**
    * Line state determines visual styling:
    * - 'future': upcoming line, dimmed
@@ -16,57 +13,20 @@
    * - 'failed': completed with errors, red indicator
    */
   export let state: 'future' | 'past' | 'success' | 'failed' = 'future';
+
+  $: isFuture = state === 'future';
+  $: isPast = state === 'past' || state === 'success' || state === 'failed';
 </script>
 
-<div class="line" class:future={state === 'future'} class:past={state === 'past' || state === 'success' || state === 'failed'}>
+<div
+  class="flex items-start gap-4 p-2 rounded-md text-left"
+  class:opacity-40={isFuture}
+  class:opacity-50={isPast}
+>
   {#if state === 'success'}
-    <span class="status-indicator success">✓</span>
+    <span class="text-lg font-bold w-6 text-center text-success">✓</span>
   {:else if state === 'failed'}
-    <span class="status-indicator failed">✗</span>
+    <span class="text-lg font-bold w-6 text-center text-error">✗</span>
   {/if}
-  <span class="line-text">{text}</span>
+  <span class="flex-1 font-mono text-lg text-text">{text}</span>
 </div>
-
-<style>
-  .line {
-    display: flex;
-    align-items: flex-start;
-    gap: var(--spacing-sm);
-    padding: var(--spacing-xs);
-    border-radius: var(--border-radius);
-    text-align: left;
-  }
-
-  .line-text {
-    font-family: var(--font-mono);
-    font-size: var(--font-size-lg);
-    color: var(--color-line-text);
-    font-weight: var(--font-weight-emphasis);
-    flex: 1;
-  }
-
-  /* Future lines appear dimmed to indicate they're upcoming */
-  .future {
-    opacity: var(--opacity-disabled);
-  }
-
-  /* Past lines are slightly faded to shift focus to current line */
-  .past {
-    opacity: var(--opacity-muted);
-  }
-
-  .status-indicator {
-    font-size: var(--font-size-lg);
-    font-weight: bold;
-    width: 1.5em;
-    text-align: center;
-  }
-
-  .status-indicator.success {
-    color: var(--color-success);
-  }
-
-  .status-indicator.failed {
-    color: var(--color-error);
-  }
-</style>

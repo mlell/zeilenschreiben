@@ -1,80 +1,47 @@
-/* Design tokens for Zeilenschreiben */
+/* Design tokens - single source of truth for visual design decisions */
 
 :root {
-  /* Colors - Primary */
+  /* === Colors === */
+  /* Primary palette */
   --color-primary: #2196f3;
-  --color-primary-dark: #1976d2;
-  --color-primary-light: #f0f8ff;
-  --color-primary-dark-bg: #1a2a3a;
-  --color-primary-transparent: rgba(33, 150, 243, 0.2);
+  --color-primary-hover: #1976d2;
+  --color-primary-muted: rgba(33, 150, 243, 0.2);
 
-  /* Colors - Semantic */
+  /* Semantic colors */
   --color-success: #4caf50;
   --color-error: #d32f2f;
-  --color-error-light: #ff6b6b;
-  --color-error-bg: #ffe0e0;
-  --color-error-bg-dark: #4a2020;
+  --color-error-muted: #ff6b6b;
 
-  /* Colors - Neutral */
-  --color-text-primary: #333;
-  --color-text-secondary: #666;
-  --color-text-tertiary: #999;
-  --color-text-light: #aaa;
-  --color-bg-light: #f5f5f5;
-  --color-bg-dark: #2a2a2a;
+  /* Text colors */
+  --color-text: #333;
+  --color-text-muted: #666;
+  --color-text-subtle: #999;
+  --color-text-correct: #000;
 
-  /* Colors - Dark mode overrides */
-  --color-text-primary-dark: #fff;
-  --color-text-secondary-dark: #ccc;
-  --color-text-tertiary-dark: #666;
+  /* Surface colors */
+  --color-surface: #ffffff;
+  --color-surface-elevated: #f5f5f5;
+  --color-background: #e8e8e8;
 
-  /* Spacing */
-  --spacing-xs: 0.5rem;
-  --spacing-sm: 1rem;
-  --spacing-md: 1.5rem;
-  --spacing-lg: 2rem;
-  --spacing-xl: 3rem;
-
-  /* Typography */
+  /* === Typography === */
   --font-mono: 'Courier New', monospace;
-  --font-size-base: 1rem;
-  --font-size-sm: 0.9rem;
-  --font-size-md: 1.1rem;
-  --font-size-lg: 1.2rem;
-  --font-size-xl: 2rem;
-  --font-size-xxl: 2.5rem;
-  --font-size-huge: 3rem;
-
-  /* Layout */
-  --border-radius: 8px;
-  --border-width: 2px;
+  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   --letter-spacing-tight: 0.05em;
-  --letter-spacing-normal: 0.1em;
 
-  /* Opacity */
-  --opacity-disabled: 0.4;
-  --opacity-muted: 0.5;
-
-  /* Transitions */
-  --transition-fast: 0.3s;
-
-  /* Dark Mode - Light mode defaults */
-  --color-heading: #333;
-  --color-body-text: #666;
-  --color-card-bg: #f5f5f5;
-  --color-lines-bg: white;
-  --color-line-text: #333;
-  --font-weight-emphasis: 400;
+  /* === Borders === */
+  --border-width: 2px;
 }
 
-/* Dark mode overrides */
+/* Dark mode */
 @media (prefers-color-scheme: dark) {
   :root {
-    --color-heading: #fff;
-    --color-body-text: #fff;
-    --color-card-bg: #333;
-    --color-lines-bg: #333;
-    --color-line-text: #fff;
-    --font-weight-emphasis: 110%;
+    --color-text: #ffffff;
+    --color-text-muted: #cccccc;
+    --color-text-subtle: #666666;
+    --color-text-correct: #ffffff;
+    --color-surface: #2a2a2a;
+    --color-surface-elevated: #333333;
+    --color-background: #1a1a1a;
+    --color-error-muted: #ff6b6b;
   }
 }

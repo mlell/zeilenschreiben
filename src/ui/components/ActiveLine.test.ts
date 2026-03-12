@@ -3,15 +3,12 @@ import { render } from '@testing-library/svelte';
 import ActiveLine from './ActiveLine.svelte';
 
 describe('ActiveLine', () => {
-  it('renders with the active-line container and background highlight', () => {
+  it('renders with the background highlight overlay', () => {
     const { container } = render(ActiveLine, {
       props: { targetText: 'Test line', typedText: '', hasError: false },
     });
 
-    // Should have the active-line wrapper with background highlight
-    const activeLine = container.querySelector('.active-line');
-    expect(activeLine).not.toBeNull();
-
+    // Should have the background highlight element
     const background = container.querySelector('.active-line-bg');
     expect(background).not.toBeNull();
   });

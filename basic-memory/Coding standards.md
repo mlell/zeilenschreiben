@@ -15,6 +15,14 @@
 - [technique] Test-driven design: write test first, then implement — see [[Tooling]]
 - [decision] German-facing UI text; code and comments in English — see [[Domain Model]]
 
+## Styling Guidelines
+
+- **Design tokens** in `src/variables.css`: colors, typography, spacing, borders, effects
+- **Tailwind utilities** in class attributes: layout, positioning, responsive, component styling
+- **Scoped `<style>` blocks** only for: complex selectors, animations, pseudo-elements
+- **Never hardcode** color values — always use `var(--color-*)` tokens
+- **Class ordering**: layout → spacing → typography → colors → states
+
 ---
 
 relates_to [[Architecture Overview]]

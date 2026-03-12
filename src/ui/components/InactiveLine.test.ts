@@ -11,9 +11,9 @@ describe('InactiveLine', () => {
     // Text should be displayed
     expect(screen.getByText('Future line')).toBeDefined();
 
-    // Should have future class for dimmed appearance
-    const line = container.querySelector('.line');
-    expect(line?.classList.contains('future')).toBe(true);
+    // Should have opacity-40 class for dimmed appearance (future state)
+    const wrapper = container.firstElementChild;
+    expect(wrapper?.classList.contains('opacity-40')).toBe(true);
   });
 
   it('shows success indicator with checkmark for successful completion', () => {
@@ -22,12 +22,10 @@ describe('InactiveLine', () => {
     });
 
     // Should show the success checkmark
-    const indicator = container.querySelector('.status-indicator.success');
-    expect(indicator).not.toBeNull();
-    expect(indicator?.textContent).toBe('✓');
+    expect(screen.getByText('✓')).toBeDefined();
 
-    // Should have past class for faded appearance
-    const line = container.querySelector('.line');
-    expect(line?.classList.contains('past')).toBe(true);
+    // Should have opacity-50 class for faded appearance (past state)
+    const wrapper = container.firstElementChild;
+    expect(wrapper?.classList.contains('opacity-50')).toBe(true);
   });
 });
