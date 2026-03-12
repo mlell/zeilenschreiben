@@ -4,55 +4,37 @@
   export let hasError: boolean = false;
 </script>
 
-<div class="typing-line">
+<div class="inline-flex flex-col flex-1">
   <!-- Display the target text with typed overlay -->
-  <div class="text-display" class:error={hasError}>
+  <div
+    class="text-display inline"
+    class:error={hasError}
+  >
     {#each targetText.split('') as char, i}
       <span
-        class="char"
+        class="char inline-block"
         class:typed={i < typedText.length}
         class:correct={i < typedText.length && typedText[i] === char}
       >
-        {char}
+        {char === ' ' ? '\u00A0' : char}
       </span>
     {/each}
   </div>
 
   {#if hasError}
-    <div class="error-message">Fehler, ENTER drücken</div>
+    <div class="error-message mt-2 text-sm font-bold">Fehler, ENTER drücken</div>
   {/if}
 </div>
 
 <style>
-  .typing-line {
-    margin: 2rem 0;
-  }
-
   .text-display {
-    font-family: 'Courier New', monospace;
-    font-size: 2rem;
-    letter-spacing: 0.1em;
-    padding: 1rem;
-    background-color: #f5f5f5;
-    border-radius: 8px;
-    min-height: 4rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .text-display.error {
-    text-decoration: line-through;
-    background-color: #ffe0e0;
+    font-family: var(--font-mono);
+    font-size: var(--font-size-lg);
+    letter-spacing: var(--letter-spacing-tight);
   }
 
   .char {
-    display: inline-block;
-    color: #999;
-  }
-
-  .char.typed {
-    color: #333;
+    color: var(--color-text-primary);
   }
 
   .char.correct {
@@ -60,32 +42,27 @@
     font-weight: bold;
   }
 
-  .error-message {
-    margin-top: 1rem;
-    color: #d32f2f;
-    font-size: 1.2rem;
-    font-weight: bold;
+  .text-display.error {
+    text-decoration: line-through;
+    color: var(--color-error);
   }
 
-  @media (prefers-color-scheme: dark) {
-    .text-display {
-      background-color: #2a2a2a;
-    }
+  .error-message {
+    color: var(--color-error);
+  }
 
+  /* Dark Mode */
+  @media (prefers-color-scheme: dark) {
     .text-display.error {
-      background-color: #4a2020;
+      color: var(--color-error-light);
     }
 
     .char {
-      color: #666;
-    }
-
-    .char.typed {
-      color: #ccc;
+      color: var(--color-text-secondary-dark);
     }
 
     .char.correct {
-      color: #fff;
+      color: var(--color-text-primary-dark);
     }
   }
 </style>

@@ -8,9 +8,9 @@ tags:
   - wiki
 ---
 
-# Bestell-App Wiki
+# Zeilenschreiben Wiki
 
-This is the AI knowledge base (wiki) for "Bestell-App", a web-app to order and pay articles at **Boeckels Beste**, a company that sells food like sausage buns.
+This is the AI knowledge base (wiki) for "Zeilenschreiben", a web-app to practice touch typing. Try to write error-free lines. Percentage of error-free lines is your accuracy score.
 
 ## Observations
 
