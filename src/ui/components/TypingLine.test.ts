@@ -27,4 +27,46 @@ describe('TypingLine', () => {
     expect(charSpans[3].classList.contains('typed')).toBe(false);
     expect(charSpans[4].classList.contains('typed')).toBe(false);
   });
+
+  it('shows error bubble when hasError is true', () => {
+    render(TypingLine, {
+      props: { targetText: 'Hello', typedText: 'Hel', hasError: true },
+    });
+
+    const errorBubble = screen.getByTestId('error-bubble');
+    expect(errorBubble).toBeTruthy();
+    expect(errorBubble.textContent).toBe('ENTER drücken');
+    expect(errorBubble.classList.contains('error-bubble')).toBe(true);
+  });
+
+  it('shows success bubble when line is completed successfully', () => {
+    render(TypingLine, {
+      props: { targetText: 'Hello', typedText: 'Hello', hasError: false },
+    });
+
+    const successBubble = screen.getByTestId('success-bubble');
+    expect(successBubble).toBeTruthy();
+    expect(successBubble.textContent).toBe('ENTER drücken');
+    expect(successBubble.classList.contains('success-bubble')).toBe(true);
+  });
+
+  it('does not show any bubble when typing is in progress without error', () => {
+    render(TypingLine, {
+      props: { targetText: 'Hello', typedText: 'Hel', hasError: false },
+    });
+
+    const errorBubble = screen.queryByTestId('error-bubble');
+    const successBubble = screen.queryByTestId('success-bubble');
+    expect(errorBubble).toBeNull();
+    expect(successBubble).toBeNull();
+  });
+
+  it('does not show success bubble when line is incomplete', () => {
+    render(TypingLine, {
+      props: { targetText: 'Hello', typedText: 'Hell', hasError: false },
+    });
+
+    const successBubble = screen.queryByTestId('success-bubble');
+    expect(successBubble).toBeNull();
+  });
 });

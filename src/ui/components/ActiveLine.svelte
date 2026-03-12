@@ -15,7 +15,7 @@
 
 <div class="relative flex items-start gap-4 p-4 rounded-md text-left">
   <!-- Semi-transparent background overlay requires absolute positioning -->
-  <div class="active-line-bg"></div>
+  <div class="active-line-bg" class:error={hasError}></div>
   <div class="relative z-10">
     <TypingLine {targetText} {typedText} {hasError} />
   </div>
@@ -29,5 +29,17 @@
     pointer-events: none;
     background-color: var(--color-primary-muted);
     border: var(--border-width) solid var(--color-primary);
+  }
+
+  .active-line-bg.error {
+    background-color: rgba(211, 47, 47, 0.2);
+    border-color: var(--color-error);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .active-line-bg.error {
+      background-color: rgba(255, 107, 107, 0.2);
+      border-color: var(--color-error-muted);
+    }
   }
 </style>
