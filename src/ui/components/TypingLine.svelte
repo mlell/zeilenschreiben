@@ -1,6 +1,21 @@
+<!--
+  Renders a line of text with character-by-character typing feedback.
+  Shows typed characters as bold, and displays error state with strikethrough.
+-->
 <script lang="ts">
+  /**
+   * The target text the user should type
+   */
   export let targetText: string = '';
+
+  /**
+   * What the user has typed so far
+   */
   export let typedText: string = '';
+
+  /**
+   * Whether the user made a typing error on this line
+   */
   export let hasError: boolean = false;
 </script>
 

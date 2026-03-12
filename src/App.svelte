@@ -1,5 +1,5 @@
 <script lang="ts">
-  import TypingLine from './lib/TypingLine.svelte';
+  import TypingArea from './ui/components/TypingArea.svelte';
 
   // Hardcoded text lines for MVP
   const lines: string[] = [
@@ -102,45 +102,7 @@
 
   {#if !isComplete}
     <!-- Typing interface -->
-    <div class="typing-container">
-      <div class="progress">
-        Zeile {currentLineIndex + 1} von {lines.length}
-      </div>
-
-      <div class="lines-display">
-        <!-- Past lines (completed) -->
-        {#each lines.slice(Math.max(0, currentLineIndex - 2), currentLineIndex) as line, idx}
-          <div class="line past-line">
-            <span class="line-text">{line}</span>
-          </div>
-        {/each}
-
-        <!-- Current line (active) -->
-        <div class="line current-line">
-          <div class="current-line-bg"></div>
-          <div class="current-line-content">
-            <TypingLine targetText={currentLine} {typedText} {hasError} />
-          </div>
-        </div>
-
-        <!-- Future lines (upcoming) -->
-        {#each lines.slice(currentLineIndex + 1, Math.min(lines.length, currentLineIndex + 3)) as line, idx}
-          <div class="line future-line">
-            <span class="line-text">{line}</span>
-          </div>
-        {/each}
-      </div>
-
-      <div class="instructions">
-        {#if hasError}
-          <p>Drücke ENTER um fortzufahren</p>
-        {:else if typedText.length === currentLine.length}
-          <p>Zeile vollständig! Drücke ENTER für die nächste Zeile</p>
-        {:else}
-          <p>Tippe die Zeile genau nach. Backspace ist deaktiviert.</p>
-        {/if}
-      </div>
-    </div>
+    <TypingArea {lines} {currentLineIndex} {typedText} {hasError} {attempts} />
   {:else}
     <!-- Results display -->
     <div class="results">
@@ -176,32 +138,6 @@ main {
   max-width: 1200px;
   margin: 0 auto;
   padding: var(--spacing-lg);
-}
-
-.typing-container {
-  /* Container for the typing interface section */
-  margin: var(--spacing-lg) 0;
-}
-
-.lines-display {
-  /* Vertical stack of text lines with adaptive background */
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-sm);
-  margin: var(--spacing-lg) 0;
-  background-color: var(--color-lines-bg);
-  padding: var(--spacing-lg);
-  border-radius: var(--border-radius);
-}
-
-.line {
-  /* Individual line container with flex layout */
-  display: flex;
-  align-items: flex-start;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-xs);
-  border-radius: var(--border-radius);
-  text-align: left;
 }
 
 .results {
@@ -242,31 +178,6 @@ h1 {
   font-weight: var(--font-weight-emphasis);
 }
 
-.progress {
-  /* Progress indicator showing current line number with adaptive color */
-  font-size: var(--font-size-lg);
-  color: var(--color-body-text);
-  font-weight: var(--font-weight-emphasis);
-  margin-bottom: var(--spacing-sm);
-}
-
-.line-text {
-  /* Monospace text for displaying lines with adaptive color */
-  font-family: var(--font-mono);
-  font-size: var(--font-size-lg);
-  color: var(--color-line-text);
-  font-weight: var(--font-weight-emphasis);
-  flex: 1;
-}
-
-.instructions {
-  /* User instructions text below the typing area with adaptive color */
-  margin-top: var(--spacing-lg);
-  font-size: var(--font-size-md);
-  color: var(--color-body-text);
-  font-weight: var(--font-weight-emphasis);
-}
-
 .stat-value {
   /* Large number display for statistics */
   font-size: var(--font-size-huge);
@@ -279,42 +190,6 @@ h1 {
   font-size: var(--font-size-base);
   color: var(--color-body-text);
   font-weight: var(--font-weight-emphasis);
-}
-
-/* === Line States === */
-.past-line {
-  /* Completed lines with reduced opacity */
-  opacity: var(--opacity-muted);
-}
-
-.current-line {
-  /* Active line with relative positioning for background layer */
-  position: relative;
-  padding: var(--spacing-sm);
-}
-
-.current-line-bg {
-  /* Semi-transparent background layer behind the text */
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(33, 150, 243, 0.2);
-  border: var(--border-width) solid var(--color-primary);
-  border-radius: var(--border-radius);
-  pointer-events: none;
-}
-
-.current-line-content {
-  /* Content layer with full opacity text */
-  position: relative;
-  z-index: 1;
-}
-
-.future-line {
-  /* Upcoming lines with disabled opacity */
-  opacity: var(--opacity-disabled);
 }
 
 /* === Results Stats === */
