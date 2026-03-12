@@ -26,3 +26,4 @@ dist-ssr
 
 # Local Obsidian files
 basic-memory/.obsidian
+.env

@@ -30,12 +30,6 @@ Enable multiple students to participate in same session simultaneously.
   - Array of attempts
   - Start/completion timestamps
 
-## Storage Strategy
-
-- Session stored in instructor's localStorage
-- Student lookup table maps code → session ID
-- Students read from instructor's storage
-- Students write attempts back to session
 
 ## Synchronization
 
