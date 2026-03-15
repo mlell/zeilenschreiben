@@ -22,7 +22,7 @@ ARG VITE_SUPABASE_PUBLISHABLE_KEY
 RUN npm run build
 
 # Production stage - lightweight nginx server
-FROM nginx:alpine AS production
+FROM nginxinc/nginx-unprivileged AS production
 
 # Copy built assets to nginx
 COPY --from=builder /app/dist /usr/share/nginx/html
@@ -30,6 +30,6 @@ COPY --from=builder /app/dist /usr/share/nginx/html
 # SPA routing: redirect all requests to index.html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-EXPOSE 80
+EXPOSE 8080
 
 CMD ["nginx", "-g", "daemon off;"]

@@ -35,6 +35,7 @@
     "vitest": "^4.0.18"
   },
   "dependencies": {
+    "pm2": "^6.0.14",
     "tailwindcss": "^4.2.1"
   }
 }
