@@ -14,9 +14,10 @@ RUN npm ci
 # Copy source and build
 COPY . .
 
-# Build arguments for Supabase configuration (injected at build time)
+# Build arguments (injected at build time)
 ARG VITE_SUPABASE_URL
 ARG VITE_SUPABASE_PUBLISHABLE_KEY
+ARG VITE_BASE_PATH=/
 
 # Build the application with environment variables
 RUN npm run build
