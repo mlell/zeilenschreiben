@@ -4,7 +4,7 @@
  * No SDK dependency - direct REST calls for minimal bundle size.
  */
 
-import type { Connection, TypingSession } from './Connection';
+import type { Connection, TypingSession, StudentResult } from './Connection';
 
 /**
  * Generate a random 6-character alphanumeric code for session access.
@@ -73,5 +73,52 @@ export class SupabaseConnection implements Connection {
 
     const sessions = await response.json();
     return sessions.length > 0 ? (sessions[0] as TypingSession) : null;
+  }
+
+  async saveStudentResult(
+    sessionId: string,
+    studentName: string,
+    typedText: string,
+    successCount: number,
+    failureCount: number,
+    accuracy: number
+  ): Promise<StudentResult> {
+    const response = await fetch(`${this.baseUrl}/student_results`, {
+      method: 'POST',
+      headers: this.headers,
+      body: JSON.stringify({
+        session_id: sessionId,
+        student_name: studentName,
+        typed_text: typedText,
+        success_count: successCount,
+        failure_count: failureCount,
+        accuracy: accuracy,
+      }),
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`Failed to save result: ${error}`);
+    }
+
+    const [result] = await response.json();
+    return result as StudentResult;
+  }
+
+  async getSessionResults(sessionId: string): Promise<StudentResult[]> {
+    const response = await fetch(
+      `${this.baseUrl}/student_results?session_id=eq.${encodeURIComponent(sessionId)}&order=completed_at.desc`,
+      {
+        method: 'GET',
+        headers: this.headers,
+      }
+    );
+
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`Failed to fetch results: ${error}`);
+    }
+
+    return (await response.json()) as StudentResult[];
   }
 }

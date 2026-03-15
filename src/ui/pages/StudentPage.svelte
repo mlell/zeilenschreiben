@@ -1,23 +1,38 @@
 <!--
   StudentPage.svelte - Student entry point for typing practice.
-  Students enter a session code to load the practice text, then
-  proceed to the typing interface once the session is loaded.
+  Students enter their name and a session code to load the practice text,
+  then proceed to the typing interface once the session is loaded.
 -->
 <script lang="ts">
   import { getConnection, type TypingSession as SessionData } from '../../connections';
   import TypingSessionView from './TypingSession.svelte';
 
-  // Code entry state
+  // Entry form state
+  let studentName: string = '';
   let code: string = '';
   let isLoading: boolean = false;
   let error: string = '';
 
   // Loaded session state
   let session: SessionData | null = null;
+  let confirmedName: string = '';
 
   async function handleSubmit(): Promise<void> {
+    const trimmedName = studentName.trim();
     const trimmedCode = code.trim().toUpperCase();
 
+    // Validate name first
+    if (!trimmedName) {
+      error = 'Bitte geben Sie Ihren Namen ein.';
+      return;
+    }
+
+    if (trimmedName.length < 2) {
+      error = 'Der Name muss mindestens 2 Zeichen lang sein.';
+      return;
+    }
+
+    // Validate code
     if (!trimmedCode) {
       error = 'Bitte geben Sie einen Code ein.';
       return;
@@ -41,6 +56,7 @@
       }
 
       session = loadedSession;
+      confirmedName = trimmedName;
     } catch (e) {
       error = e instanceof Error ? e.message : 'Ein Fehler ist aufgetreten.';
     } finally {
@@ -56,21 +72,39 @@
 
   function goBack(): void {
     session = null;
+    confirmedName = '';
     code = '';
     error = '';
   }
 </script>
 
 {#if session}
-  <TypingSessionView {session} onBack={goBack} />
+  <TypingSessionView {session} studentName={confirmedName} onBack={goBack} />
 {:else}
   <main class="max-w-xl mx-auto p-8">
-    <h1 class="text-4xl mb-8 text-text font-normal">Schüler-Bereich</h1>
-
     <div class="space-y-6">
+      <!-- Name Input -->
+      <div>
+        <label for="name-input" class="block text-lg mb-2 text-text">
+          Dein Name
+        </label>
+        <input
+          id="name-input"
+          type="text"
+          bind:value={studentName}
+          on:keydown={handleKeyDown}
+          placeholder="Vor- und Nachname"
+          maxlength="100"
+          class="w-full p-4 text-lg bg-surface border border-border rounded-md text-text focus:outline-none focus:border-primary"
+          disabled={isLoading}
+          autocomplete="name"
+        />
+      </div>
+
+      <!-- Code Input -->
       <div>
         <label for="code-input" class="block text-lg mb-2 text-text">
-          Session-Code eingeben
+          Aufgaben-Code
         </label>
         <input
           id="code-input"

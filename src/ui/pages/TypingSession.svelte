@@ -1,13 +1,14 @@
 <!--
   TypingSession.svelte - Typing practice interface for students.
-  Displays the loaded session text and handles the typing mechanics.
-  Reuses the existing TypingArea component for consistent UX.
+  Displays the student name prominently, handles typing mechanics,
+  and saves results to the database upon completion.
 -->
 <script lang="ts">
   import TypingArea from '../components/TypingArea.svelte';
-  import type { TypingSession as TypingSessionType } from '../../connections';
+  import { getConnection, type TypingSession as TypingSessionType } from '../../connections';
 
   export let session: TypingSessionType;
+  export let studentName: string;
   export let onBack: () => void;
 
   // Parse text into lines, filtering empty lines
@@ -21,7 +22,10 @@
   let typedText: string = '';
   let hasError: boolean = false;
   let attempts: boolean[] = [];
+  let typedLines: string[] = [];
   let isComplete: boolean = false;
+  let isSaving: boolean = false;
+  let saveError: string = '';
 
   $: currentLine = lines[currentLineIndex] || '';
 
@@ -60,15 +64,17 @@
   function recordAttempt(): void {
     const success: boolean = !hasError && typedText.length === currentLine.length;
     attempts = [...attempts, success];
+    typedLines = [...typedLines, typedText];
   }
 
-  function advanceToNextLine(): void {
+  async function advanceToNextLine(): Promise<void> {
     if (currentLineIndex < lines.length - 1) {
       currentLineIndex++;
       typedText = '';
       hasError = false;
     } else {
       isComplete = true;
+      await saveResults();
     }
   }
 
@@ -77,19 +83,43 @@
   $: failureCount = attempts.filter((a) => !a).length;
   $: accuracy = attempts.length > 0 ? Math.round((successCount / attempts.length) * 100) : 0;
 
+  async function saveResults(): Promise<void> {
+    isSaving = true;
+    saveError = '';
+
+    try {
+      const connection = getConnection();
+      const fullTypedText = typedLines.join('\n');
+      await connection.saveStudentResult(
+        session.id,
+        studentName,
+        fullTypedText,
+        successCount,
+        failureCount,
+        accuracy
+      );
+    } catch (e) {
+      saveError = e instanceof Error ? e.message : 'Fehler beim Speichern.';
+    } finally {
+      isSaving = false;
+    }
+  }
+
   function restart(): void {
     currentLineIndex = 0;
     typedText = '';
     hasError = false;
     attempts = [];
+    typedLines = [];
     isComplete = false;
+    saveError = '';
   }
 </script>
 
 <svelte:window on:keydown={handleKeyDown} />
 
 <main class="max-w-5xl mx-auto p-8">
-  <div class="flex items-center justify-between mb-8">
+  <div class="flex items-center justify-between mb-4">
     <h1 class="text-4xl text-text font-normal">Zeilenschreiben</h1>
     <button
       on:click={onBack}
@@ -99,8 +129,15 @@
     </button>
   </div>
 
+  <!-- Student Name Display - prominent positioning -->
+  <div class="mb-6 p-4 bg-primary/10 border border-primary/30 rounded-lg">
+    <div class="text-2xl font-semibold text-primary">
+      {studentName}
+    </div>
+  </div>
+
   <div class="mb-4 text-sm text-text-muted">
-    Session-Code: <span class="font-mono font-bold">{session.code}</span>
+    Aufgaben-Code: <span class="font-mono font-bold">{session.code}</span>
   </div>
 
   {#if !isComplete}
@@ -108,6 +145,20 @@
   {:else}
     <div class="mt-12">
       <h2 class="text-xl mb-8 text-text font-normal">Ergebnisse</h2>
+
+      {#if isSaving}
+        <div class="p-4 bg-surface-elevated rounded-md text-text-muted mb-8">
+          Ergebnisse werden gespeichert...
+        </div>
+      {:else if saveError}
+        <div class="p-4 bg-error/10 border border-error rounded-md text-error mb-8">
+          {saveError}
+        </div>
+      {:else}
+        <div class="p-4 bg-success/10 border border-success/30 rounded-md text-success mb-8">
+          Ergebnisse wurden gespeichert!
+        </div>
+      {/if}
 
       <div class="flex justify-around my-8 gap-8">
         <div class="flex-1 p-6 bg-surface-elevated rounded-md">

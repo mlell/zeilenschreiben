@@ -46,28 +46,22 @@
     <p class="text-text-muted">Wird geladen...</p>
   </main>
 {:else if currentPage === 'home'}
-  <main class="max-w-xl mx-auto p-8">
     <h1 class="text-4xl mb-8 text-text font-normal text-center">Zeilenschreiben</h1>
     <p class="text-center text-text-muted mb-12">
       Übung macht den Meister – Zeile für Zeile.
     </p>
 
-    <div class="flex flex-col gap-4">
-      <button
+    <div class="space-y-6">
+    <StudentPage />
+    </div>
+  <div class="max-w-xl mx-auto p-8">
+    <button
         on:click={() => navigate('teacher')}
-        class="w-full px-8 py-6 text-xl bg-primary text-white border-none rounded-md cursor-pointer transition-colors duration-300 hover:bg-primary-hover"
+        class="w-full px-1 py-2 text-sm bg-background text-gray border border-border rounded-md cursor-pointer transition-colors duration-300 hover:bg-primary-hover"
       >
         Ich bin Lehrer
       </button>
-
-      <button
-        on:click={() => navigate('student')}
-        class="w-full px-8 py-6 text-xl bg-surface border-2 border-primary text-primary rounded-md cursor-pointer transition-colors duration-300 hover:bg-primary/10"
-      >
-        Ich bin Schüler
-      </button>
     </div>
-  </main>
 {:else if currentPage === 'teacher'}
   <div class="mb-4 p-4">
     <button
@@ -78,14 +72,4 @@
     </button>
   </div>
   <TeacherPage />
-{:else if currentPage === 'student'}
-  <div class="mb-4 p-4">
-    <button
-      on:click={() => navigate('home')}
-      class="text-sm text-text-muted hover:text-text transition-colors cursor-pointer"
-    >
-      ← Zurück zur Startseite
-    </button>
-  </div>
-  <StudentPage />
 {/if}

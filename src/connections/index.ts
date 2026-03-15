@@ -3,7 +3,7 @@
  * Provides a centralized way to access the backend connection throughout the app.
  */
 
-export type { Connection, TypingSession } from './Connection';
+export type { Connection, TypingSession, StudentResult } from './Connection';
 export { SupabaseConnection } from './SupabaseConnection';
 
 import type { Connection } from './Connection';
