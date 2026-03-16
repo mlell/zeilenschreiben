@@ -118,16 +118,15 @@
 
 <svelte:window on:keydown={handleKeyDown} />
 
-<main class="max-w-5xl mx-auto p-8">
-  <div class="flex items-center justify-between mb-4">
-    <h1 class="text-4xl text-text font-normal">Zeilenschreiben</h1>
-    <button
-      on:click={onBack}
-      class="px-4 py-2 text-sm bg-surface border border-border text-text rounded-md cursor-pointer hover:bg-surface-elevated transition-colors"
-    >
-      ← Zurück
-    </button>
-  </div>
+<div class="flex items-center justify-between mb-4">
+  <h1 class="text-4xl text-text font-normal">Zeilenschreiben</h1>
+  <button
+    on:click={onBack}
+    class="px-4 py-2 text-sm bg-surface border border-border text-text rounded-md cursor-pointer hover:bg-surface-elevated transition-colors"
+  >
+    ← Zurück
+  </button>
+</div>
 
   <!-- Student Name Display - prominent positioning -->
   <div class="mb-6 p-4 bg-primary/10 border border-primary/30 rounded-lg">
@@ -193,4 +192,3 @@
       </div>
     </div>
   {/if}
-</main>

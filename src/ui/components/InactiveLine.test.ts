@@ -24,8 +24,8 @@ describe('InactiveLine', () => {
     // Should show the success checkmark
     expect(screen.getByText('✓')).toBeDefined();
 
-    // Should have opacity-50 class for faded appearance (past state)
+    // Should NOT have opacity-40 class (only future state has it)
     const wrapper = container.firstElementChild;
-    expect(wrapper?.classList.contains('opacity-50')).toBe(true);
+    expect(wrapper?.classList.contains('opacity-40')).toBe(false);
   });
 });

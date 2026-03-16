@@ -26,7 +26,8 @@
     .map((text, idx) => {
       const attemptIndex = Math.max(0, currentLineIndex - PAST_LINES_VISIBLE) + idx;
       const success = attempts[attemptIndex];
-      return { text, state: success === undefined ? 'past' : success ? 'success' : 'failed' };
+      const state: 'past' | 'success' | 'failed' = success === undefined ? 'past' : success ? 'success' : 'failed';
+      return { text, state };
     });
 
   $: futureLines = lines.slice(

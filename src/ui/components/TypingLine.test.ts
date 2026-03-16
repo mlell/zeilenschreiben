@@ -18,14 +18,14 @@ describe('TypingLine', () => {
 
     // First 3 characters should have the "typed" and "correct" classes
     const charSpans = container.querySelectorAll('.char');
-    expect(charSpans[0].classList.contains('typed')).toBe(true);
-    expect(charSpans[0].classList.contains('correct')).toBe(true);
-    expect(charSpans[2].classList.contains('typed')).toBe(true);
-    expect(charSpans[2].classList.contains('correct')).toBe(true);
+    expect(charSpans[0]!.classList.contains('typed')).toBe(true);
+    expect(charSpans[0]!.classList.contains('correct')).toBe(true);
+    expect(charSpans[2]!.classList.contains('typed')).toBe(true);
+    expect(charSpans[2]!.classList.contains('correct')).toBe(true);
 
     // Remaining characters should not be typed
-    expect(charSpans[3].classList.contains('typed')).toBe(false);
-    expect(charSpans[4].classList.contains('typed')).toBe(false);
+    expect(charSpans[3]!.classList.contains('typed')).toBe(false);
+    expect(charSpans[4]!.classList.contains('typed')).toBe(false);
   });
 
   it('shows error bubble when hasError is true', () => {

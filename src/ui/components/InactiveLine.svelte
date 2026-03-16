@@ -15,7 +15,6 @@
   export let state: 'future' | 'past' | 'success' | 'failed' = 'future';
 
   $: isFuture = state === 'future';
-  $: isPast = state === 'past' || state === 'success' || state === 'failed';
 </script>
 
 <div class="relative flex items-start gap-4 p-2 rounded-md text-left" class:opacity-40={isFuture}>

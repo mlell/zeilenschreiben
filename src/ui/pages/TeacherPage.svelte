@@ -138,8 +138,7 @@
   }
 </script>
 
-<main class="max-w-4xl mx-auto p-8">
-  <h1 class="text-4xl mb-8 text-text font-normal">Lehrer-Bereich</h1>
+<h1 class="text-4xl mb-8 text-text font-normal">Lehrer-Bereich</h1>
 
   <!-- Main View: Existing Session first, then New Session -->
   {#if viewMode === 'main'}
@@ -358,4 +357,3 @@
       </details>
     </div>
   {/if}
-</main>

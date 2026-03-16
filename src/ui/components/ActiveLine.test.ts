@@ -23,8 +23,8 @@ describe('ActiveLine', () => {
     expect(charSpans.length).toBe(5);
 
     // First 3 should be typed
-    expect(charSpans[0].classList.contains('typed')).toBe(true);
-    expect(charSpans[2].classList.contains('typed')).toBe(true);
-    expect(charSpans[3].classList.contains('typed')).toBe(false);
+    expect(charSpans[0]!.classList.contains('typed')).toBe(true);
+    expect(charSpans[2]!.classList.contains('typed')).toBe(true);
+    expect(charSpans[3]!.classList.contains('typed')).toBe(false);
   });
 });
