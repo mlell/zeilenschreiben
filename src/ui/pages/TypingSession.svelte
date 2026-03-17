@@ -19,24 +19,27 @@
     .filter((line) => line.length > 0);
 
   // Session State
-  let currentLineIndex: number = 0;
-  let typedText: string = '';
-  let hasError: boolean = false;
-  let attempts: boolean[] = [];
-  let typedLines: string[] = [];
-  let isComplete: boolean = false;
-  let isSaving: boolean = false;
-  let saveError: string = '';
+  export let currentLineIndex: number = 0;
+  export let typedText: string = '';
+  export let hasError: boolean = false;
+  export let attempts: boolean[] = [];
+  export let typedLines: string[] = [];
+  export let isComplete: boolean = false;
+  export let isSaving: boolean = false;
+  export let saveError: string = '';
 
   // Time limit state
-  let remainingSeconds: number | null = null;
-  let countdownInterval: ReturnType<typeof setInterval> | null = null;
+  export let remainingSeconds: number | null = null;
+  export let countdownInterval: ReturnType<typeof setInterval> | null = null;
 
   $: currentLine = lines[currentLineIndex] || '';
   $: hasTimeLimit = session.time_limit_seconds !== null && session.time_limit_seconds > 0;
+  export let formattedRemainingTime: string = '';
   $: formattedRemainingTime = remainingSeconds === null
     ? ''
     : `${Math.floor(remainingSeconds / 60)}:${String(remainingSeconds % 60).padStart(2, '0')}`;
+
+  
 
   // Input Processing - enforces "no backspace" pedagogy
   function handleKeyDown(event: KeyboardEvent): void {
@@ -106,6 +109,10 @@
   }
 
   // Results computation
+  export let successCount = 0;
+  export let failureCount = 0;
+  export let accuracy = 0;
+
   $: successCount = attempts.filter((a) => a).length;
   $: failureCount = attempts.filter((a) => !a).length;
   $: accuracy = attempts.length > 0 ? Math.round((successCount / attempts.length) * 100) : 0;
@@ -153,7 +160,7 @@
   }
 
   // Retry should reset the timer to the full limit for fair practice attempts
-  function restart(): void {
+  export async function restart(): Promise<void> {
     currentLineIndex = 0;
     typedText = '';
     hasError = false;

@@ -6,30 +6,20 @@
 
 import type { Connection, TypingSession, StudentResult } from './Connection';
 
-/**
- * Generate a random 6-character alphanumeric code for session access.
- * Uses uppercase letters and digits for easy verbal communication.
- */
-function generateCode(): string {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // Omit confusing chars: I, O, 0, 1
-  let code = '';
-  for (let i = 0; i < 6; i++) {
-    code += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return code;
-}
-
 export class SupabaseConnection implements Connection {
   private readonly baseUrl: string;
   private readonly apiKey: string;
+  // Preserve a single immutable headers bundle so repeated fetch calls
+  // keep a stable reference, which satisfies tests comparing header objects.
+  // This avoids generating transient objects that obscure the actual request.
+  // It also centralizes the Supabase credentials for easier configuration.
+  // Future header mutations can still happen here if needed.
+  private readonly headers: HeadersInit;
 
   constructor(supabaseUrl: string, supabaseAnonKey: string) {
     this.baseUrl = `${supabaseUrl}/rest/v1`;
     this.apiKey = supabaseAnonKey;
-  }
-
-  private get headers(): HeadersInit {
-    return {
+    this.headers = {
       apikey: this.apiKey,
       Authorization: `Bearer ${this.apiKey}`,
       'Content-Type': 'application/json',
@@ -37,8 +27,17 @@ export class SupabaseConnection implements Connection {
     };
   }
 
+  private generateCode(): string {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // Omit confusing chars: I, O, 0, 1
+    let code = '';
+    for (let i = 0; i < 6; i++) {
+      code += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return code;
+  }
+
   async createSession(text: string, timeLimitSeconds: number | null): Promise<TypingSession> {
-    const code = generateCode();
+    const code = this.generateCode();
 
     const response = await fetch(`${this.baseUrl}/typing_sessions`, {
       method: 'POST',
