@@ -11,6 +11,7 @@
 
   // New session form state
   let text: string = '';
+  let timeLimitMinutesInput: number | null = null;
   let isSubmitting: boolean = false;
   let error: string = '';
   let generatedCode: string = '';
@@ -27,12 +28,23 @@
       return;
     }
 
+    // Allow untimed practice by keeping the time limit optional for instructors.
+    const timeLimitMinutes = timeLimitMinutesInput ?? null;
+
+    if (timeLimitMinutes !== null) {
+      if (!Number.isFinite(timeLimitMinutes) || timeLimitMinutes <= 0) {
+        error = 'Bitte geben Sie ein gültiges Zeitlimit in Minuten ein.';
+        return;
+      }
+    }
+
     isSubmitting = true;
     error = '';
 
     try {
       const connection = getConnection();
-      const session = await connection.createSession(text.trim());
+      const timeLimitSeconds = timeLimitMinutes === null ? null : Math.round(timeLimitMinutes * 60);
+      const session = await connection.createSession(text.trim(), timeLimitSeconds);
       generatedCode = session.code;
       viewMode = 'success';
     } catch (e) {
@@ -124,6 +136,7 @@
   function goToMain(): void {
     viewMode = 'main';
     text = '';
+    timeLimitMinutesInput = null;
     existingCode = '';
     generatedCode = '';
     loadedSession = null;
@@ -197,6 +210,26 @@
             Jede Zeile wird einzeln zum Tippen angezeigt.
           </p>
         </div>
+
+        <div>
+          <label for="time-limit-input" class="block text-lg mb-2 text-text">
+            Zeitlimit (Minuten, optional)
+          </label>
+          <input
+            id="time-limit-input"
+            type="number"
+            min="1"
+            step="1"
+            bind:value={timeLimitMinutesInput}
+            placeholder="z.B. 5"
+            class="w-full max-w-xs p-4 text-lg bg-surface border border-border rounded-md text-text focus:outline-none focus:border-primary"
+            disabled={isSubmitting}
+          />
+          <p class="mt-2 text-sm text-text-muted">
+            Leer lassen, um ohne Zeitlimit zu starten.
+          </p>
+        </div>
+
 
         <button
           type="submit"

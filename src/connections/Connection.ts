@@ -9,6 +9,7 @@ export interface TypingSession {
   code: string;
   text: string;
   created_at: string;
+  time_limit_seconds: number | null;
 }
 
 export interface StudentResult {
@@ -27,7 +28,7 @@ export interface Connection {
    * Store a new typing session with the given text.
    * @returns The generated session with its unique access code
    */
-  createSession(text: string): Promise<TypingSession>;
+  createSession(text: string, timeLimitSeconds: number | null): Promise<TypingSession>;
 
   /**
    * Retrieve a session by its access code.

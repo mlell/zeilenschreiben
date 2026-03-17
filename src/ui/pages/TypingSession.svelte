@@ -4,6 +4,7 @@
   and saves results to the database upon completion.
 -->
 <script lang="ts">
+  import { onDestroy, onMount } from 'svelte';
   import TypingArea from '../components/TypingArea.svelte';
   import { getConnection, type TypingSession as TypingSessionType } from '../../connections';
 
@@ -27,7 +28,15 @@
   let isSaving: boolean = false;
   let saveError: string = '';
 
+  // Time limit state
+  let remainingSeconds: number | null = null;
+  let countdownInterval: ReturnType<typeof setInterval> | null = null;
+
   $: currentLine = lines[currentLineIndex] || '';
+  $: hasTimeLimit = session.time_limit_seconds !== null && session.time_limit_seconds > 0;
+  $: formattedRemainingTime = remainingSeconds === null
+    ? ''
+    : `${Math.floor(remainingSeconds / 60)}:${String(remainingSeconds % 60).padStart(2, '0')}`;
 
   // Input Processing - enforces "no backspace" pedagogy
   function handleKeyDown(event: KeyboardEvent): void {
@@ -61,6 +70,23 @@
     }
   }
 
+  // Countdown lifecycle for timed sessions to keep students synchronized
+  function stopCountdown(): void {
+    if (countdownInterval) {
+      clearInterval(countdownInterval);
+      countdownInterval = null;
+    }
+  }
+
+  async function completeDueToTimeout(): Promise<void> {
+    if (!isComplete && (typedText.length > 0 || hasError)) {
+      recordAttempt();
+    }
+    isComplete = true;
+    stopCountdown();
+    await saveResults();
+  }
+
   function recordAttempt(): void {
     const success: boolean = !hasError && typedText.length === currentLine.length;
     attempts = [...attempts, success];
@@ -74,6 +100,7 @@
       hasError = false;
     } else {
       isComplete = true;
+      stopCountdown();
       await saveResults();
     }
   }
@@ -105,6 +132,27 @@
     }
   }
 
+  function startCountdown(): void {
+    stopCountdown();
+
+    if (!hasTimeLimit || session.time_limit_seconds === null) {
+      remainingSeconds = null;
+      return;
+    }
+
+    remainingSeconds = session.time_limit_seconds;
+    countdownInterval = setInterval(() => {
+      if (remainingSeconds === null) return;
+      remainingSeconds -= 1;
+
+      if (remainingSeconds <= 0) {
+        remainingSeconds = 0;
+        completeDueToTimeout();
+      }
+    }, 1000);
+  }
+
+  // Retry should reset the timer to the full limit for fair practice attempts
   function restart(): void {
     currentLineIndex = 0;
     typedText = '';
@@ -113,7 +161,17 @@
     typedLines = [];
     isComplete = false;
     saveError = '';
+    startCountdown();
   }
+
+  // Lifecycle hooks keep the timer aligned with the active typing view
+  onMount(() => {
+    startCountdown();
+  });
+
+  onDestroy(() => {
+    stopCountdown();
+  });
 </script>
 
 <svelte:window on:keydown={handleKeyDown} />
@@ -135,8 +193,15 @@
     </div>
   </div>
 
-  <div class="mb-4 text-sm text-text-muted">
-    Aufgaben-Code: <span class="font-mono font-bold">{session.code}</span>
+  <div class="mb-4 text-sm text-text-muted flex items-center justify-between">
+    <div>
+      Aufgaben-Code: <span class="font-mono font-bold">{session.code}</span>
+    </div>
+    {#if hasTimeLimit && remainingSeconds !== null}
+      <div class="px-3 py-1 rounded-md bg-surface-elevated text-text">
+        Zeit übrig: <span class="font-mono font-bold">{formattedRemainingTime}</span>
+      </div>
+    {/if}
   </div>
 
   {#if !isComplete}

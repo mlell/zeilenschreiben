@@ -37,13 +37,13 @@ export class SupabaseConnection implements Connection {
     };
   }
 
-  async createSession(text: string): Promise<TypingSession> {
+  async createSession(text: string, timeLimitSeconds: number | null): Promise<TypingSession> {
     const code = generateCode();
 
     const response = await fetch(`${this.baseUrl}/typing_sessions`, {
       method: 'POST',
       headers: this.headers,
-      body: JSON.stringify({ code, text }),
+      body: JSON.stringify({ code, text, time_limit_seconds: timeLimitSeconds }),
     });
 
     if (!response.ok) {
