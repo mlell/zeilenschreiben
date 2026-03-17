@@ -20,6 +20,7 @@
     "@tailwindcss/vite": "^4.2.1",
     "@testing-library/svelte": "^5.3.1",
     "@types/eslint__js": "^8.42.3",
+    "@vitest/coverage-v8": "^4.1.0",
     "eslint": "^10.0.3",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-svelte": "^3.15.2",
@@ -35,6 +36,7 @@
     "vitest": "^4.0.18"
   },
   "dependencies": {
+    "playwright": "^1.58.2",
     "pm2": "^6.0.14",
     "tailwindcss": "^4.2.1"
   }
