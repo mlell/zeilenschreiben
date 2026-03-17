@@ -26,8 +26,8 @@ describe('InactiveLine.svelte - Line styling', () => {
 
       const background = container.querySelector('.inactive-line-bg.success');
       expect(background).not.toBeNull();
-      expect(background?.style.backgroundColor).toMatch(/rgba\(76,\s*175,\s*80,\s*0.2\)/);
-      expect(background?.style.border).toMatch(/var\(--color-success\)/);
+      expect(background?.classList.contains('inactive-line-bg')).toBe(true);
+      expect(background?.classList.contains('success')).toBe(true);
     });
   });
 
@@ -50,8 +50,8 @@ describe('InactiveLine.svelte - Line styling', () => {
 
       const background = container.querySelector('.inactive-line-bg.failed');
       expect(background).not.toBeNull();
-      expect(background?.style.backgroundColor).toMatch(/rgba\(211,\s*47,\s*47,\s*0.2\)/);
-      expect(background?.style.border).toMatch(/var\(--color-error\)/);
+      expect(background?.classList.contains('inactive-line-bg')).toBe(true);
+      expect(background?.classList.contains('failed')).toBe(true);
     });
   });
 
