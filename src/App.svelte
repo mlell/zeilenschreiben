@@ -14,16 +14,25 @@
   type Page = 'home' | 'teacher' | 'student';
 
   let currentPage: Page = 'home';
-  let initError: string = '';
+  let backendWarning: string = '';
   let isInitialized: boolean = false;
+  let isBackendAvailable: boolean = false;
 
   onMount(() => {
     try {
       validateConfig();
       initConnection(config.supabase.url, config.supabase.anonKey);
+      isBackendAvailable = true;
       isInitialized = true;
     } catch (e) {
-      initError = e instanceof Error ? e.message : 'Initialisierungsfehler';
+      // Self-practice must remain usable even if backend credentials are absent.
+      // We therefore downgrade connection bootstrap failures into a warning.
+      // Teacher features and code-based joining still require backend connectivity.
+      // This separation prevents offline users from being blocked on app startup.
+      // It keeps server-dependent paths explicit while preserving core pedagogy.
+      backendWarning = e instanceof Error ? e.message : 'Initialisierungsfehler';
+      isBackendAvailable = false;
+      isInitialized = true;
     }
   });
 
@@ -32,24 +41,25 @@
   }
 </script>
 
-{#if initError}
-  <Layout width="narrow">
-    <div class="p-6 bg-error/10 border border-error rounded-md">
-      <h2 class="text-xl mb-4 text-error font-bold">Konfigurationsfehler</h2>
-      <p class="text-text">{initError}</p>
-      <p class="mt-4 text-sm text-text-muted">
-        Bitte stellen Sie sicher, dass die Umgebungsvariablen korrekt gesetzt sind.
-      </p>
-    </div>
-  </Layout>
-{:else if !isInitialized}
+{#if !isInitialized}
   <Layout width="narrow">
     <div class="text-center">
       <p class="text-text-muted">Wird geladen...</p>
     </div>
   </Layout>
 {:else if currentPage === 'home'}
-  <StudentForm onNavigate={navigate} />
+  {#if backendWarning}
+    <Layout width="narrow">
+      <div class="p-4 mb-6 bg-error/10 border border-error rounded-md">
+        <h2 class="text-lg text-error font-bold">Hinweis zur Server-Verbindung</h2>
+        <p class="text-text mt-1">{backendWarning}</p>
+        <p class="text-sm text-text-muted mt-2">
+          Selbstständig Üben funktioniert weiterhin ohne Server.
+        </p>
+      </div>
+    </Layout>
+  {/if}
+  <StudentForm onNavigate={navigate} backendAvailable={isBackendAvailable} />
 {:else if currentPage === 'teacher'}
   <Layout width="wide">
     <div class="mb-4">

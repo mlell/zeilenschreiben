@@ -5,6 +5,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { SupabaseConnection } from './SupabaseConnection';
 
+type MockFetch = ReturnType<typeof vi.fn>;
+
 describe('SupabaseConnection', () => {
   const mockUrl = 'https://mock-supabase-url.supabase.co';
   const mockKey = 'mock-anon-key';
@@ -65,13 +67,13 @@ describe('SupabaseConnection', () => {
         json: vi.fn().mockResolvedValue([{ id: '1', code: 'ABC123', text: 'Test', time_limit_seconds: 300 }]),
       };
 
-      global.fetch = vi.fn().mockResolvedValue(mockResponse);
+      globalThis.fetch = vi.fn().mockResolvedValue(mockResponse);
 
       const session = await connection.createSession('Test text', 300);
 
-      const fetchMock = fetch as unknown as vi.Mock;
+      const fetchMock = fetch as unknown as MockFetch;
       expect(fetchMock).toHaveBeenCalledTimes(1);
-      const [, requestOptions] = fetchMock.mock.calls[0];
+      const [, requestOptions] = fetchMock.mock.calls[0]!;
 
       expect(requestOptions.method).toBe('POST');
       expect(requestOptions.headers).toBe(connection['headers']);
@@ -90,13 +92,13 @@ describe('SupabaseConnection', () => {
         json: vi.fn().mockResolvedValue([{ id: '1', code: 'ABC123', text: 'Test', time_limit_seconds: null }]),
       };
 
-      global.fetch = vi.fn().mockResolvedValue(mockResponse);
+      globalThis.fetch = vi.fn().mockResolvedValue(mockResponse);
 
       const session = await connection.createSession('Test text', null);
 
-      const fetchMock = fetch as unknown as vi.Mock;
+      const fetchMock = fetch as unknown as MockFetch;
       expect(fetchMock).toHaveBeenCalledTimes(1);
-      const [, requestOptions] = fetchMock.mock.calls[0];
+      const [, requestOptions] = fetchMock.mock.calls[0]!;
 
       expect(requestOptions.method).toBe('POST');
       expect(requestOptions.headers).toBe(connection['headers']);
@@ -115,7 +117,7 @@ describe('SupabaseConnection', () => {
         text: vi.fn().mockResolvedValue('Database error'),
       };
 
-      global.fetch = vi.fn().mockResolvedValue(mockResponse);
+      globalThis.fetch = vi.fn().mockResolvedValue(mockResponse);
 
       await expect(connection.createSession('Test text', 300)).rejects.toThrow(
         'Failed to create session: Database error'
@@ -132,7 +134,7 @@ describe('SupabaseConnection', () => {
         json: vi.fn().mockResolvedValue([mockSession]),
       };
 
-      global.fetch = vi.fn().mockResolvedValue(mockResponse);
+      globalThis.fetch = vi.fn().mockResolvedValue(mockResponse);
 
       const session = await connection.getSessionByCode('abc123');
 
@@ -155,7 +157,7 @@ describe('SupabaseConnection', () => {
         json: vi.fn().mockResolvedValue([mockSession]),
       };
 
-      global.fetch = vi.fn().mockResolvedValue(mockResponse);
+      globalThis.fetch = vi.fn().mockResolvedValue(mockResponse);
 
       await connection.getSessionByCode('  abc123  ');
 
@@ -171,7 +173,7 @@ describe('SupabaseConnection', () => {
         json: vi.fn().mockResolvedValue([]), // Empty array
       };
 
-      global.fetch = vi.fn().mockResolvedValue(mockResponse);
+      globalThis.fetch = vi.fn().mockResolvedValue(mockResponse);
 
       const session = await connection.getSessionByCode('NONE123');
 
@@ -184,7 +186,7 @@ describe('SupabaseConnection', () => {
         text: vi.fn().mockResolvedValue('Network error'),
       };
 
-      global.fetch = vi.fn().mockResolvedValue(mockResponse);
+      globalThis.fetch = vi.fn().mockResolvedValue(mockResponse);
 
       await expect(connection.getSessionByCode('ABC123')).rejects.toThrow(
         'Failed to fetch session: Network error'
@@ -210,7 +212,7 @@ describe('SupabaseConnection', () => {
         json: vi.fn().mockResolvedValue([mockResult]),
       };
 
-      global.fetch = vi.fn().mockResolvedValue(mockResponse);
+      globalThis.fetch = vi.fn().mockResolvedValue(mockResponse);
 
       const result = await connection.saveStudentResult(
         'session-1',
@@ -244,7 +246,7 @@ describe('SupabaseConnection', () => {
         text: vi.fn().mockResolvedValue('Validation error'),
       };
 
-      global.fetch = vi.fn().mockResolvedValue(mockResponse);
+      globalThis.fetch = vi.fn().mockResolvedValue(mockResponse);
 
       await expect(
         connection.saveStudentResult('session-1', 'Test Student', 'Typed text', 2, 1, 67)
@@ -265,7 +267,7 @@ describe('SupabaseConnection', () => {
         json: vi.fn().mockResolvedValue(mockResults),
       };
 
-      global.fetch = vi.fn().mockResolvedValue(mockResponse);
+      globalThis.fetch = vi.fn().mockResolvedValue(mockResponse);
 
       const results = await connection.getSessionResults('session-1');
 
@@ -287,7 +289,7 @@ describe('SupabaseConnection', () => {
         json: vi.fn().mockResolvedValue([]),
       };
 
-      global.fetch = vi.fn().mockResolvedValue(mockResponse);
+      globalThis.fetch = vi.fn().mockResolvedValue(mockResponse);
 
       const results = await connection.getSessionResults('session-1');
 
@@ -300,7 +302,7 @@ describe('SupabaseConnection', () => {
         text: vi.fn().mockResolvedValue('Authentication error'),
       };
 
-      global.fetch = vi.fn().mockResolvedValue(mockResponse);
+      globalThis.fetch = vi.fn().mockResolvedValue(mockResponse);
 
       await expect(connection.getSessionResults('session-1')).rejects.toThrow(
         'Failed to fetch results: Authentication error'
@@ -311,7 +313,7 @@ describe('SupabaseConnection', () => {
   // ========== ERROR HANDLING ========== //
   describe('Error handling', () => {
     it('handles network errors gracefully', async () => {
-      global.fetch = vi.fn().mockRejectedValue(new Error('Network timeout'));
+      globalThis.fetch = vi.fn().mockRejectedValue(new Error('Network timeout'));
 
       await expect(connection.createSession('Test', 300)).rejects.toThrow();
       await expect(connection.getSessionByCode('ABC123')).rejects.toThrow();
@@ -327,13 +329,15 @@ describe('SupabaseConnection', () => {
         text: vi.fn().mockResolvedValue('Custom error message'),
       };
 
-      global.fetch = vi.fn().mockResolvedValue(mockResponse);
+      globalThis.fetch = vi.fn().mockResolvedValue(mockResponse);
 
       try {
         await connection.createSession('Test', 300);
       } catch (error) {
         expect(error).toBeInstanceOf(Error);
-        expect(error.message).toContain('Custom error message');
+        if (error instanceof Error) {
+          expect(error.message).toContain('Custom error message');
+        }
       }
     });
   });
@@ -346,12 +350,12 @@ describe('SupabaseConnection', () => {
         json: vi.fn().mockResolvedValue([{ id: '1', code: 'ABC123', text: '', time_limit_seconds: null }]),
       };
 
-      global.fetch = vi.fn().mockResolvedValue(mockResponse);
+      globalThis.fetch = vi.fn().mockResolvedValue(mockResponse);
 
       const session = await connection.createSession('', null);
 
-      const fetchMock = fetch as unknown as vi.Mock;
-      const [, requestOptions] = fetchMock.mock.calls[0];
+      const fetchMock = fetch as unknown as MockFetch;
+      const [, requestOptions] = fetchMock.mock.calls[0]!;
       const body = JSON.parse(requestOptions.body);
 
       expect(body.text).toBe('');
@@ -377,7 +381,7 @@ describe('SupabaseConnection', () => {
         json: vi.fn().mockResolvedValue([mockResult]),
       };
 
-      global.fetch = vi.fn().mockResolvedValue(mockResponse);
+      globalThis.fetch = vi.fn().mockResolvedValue(mockResponse);
 
       const result = await connection.saveStudentResult(
         'session-1',

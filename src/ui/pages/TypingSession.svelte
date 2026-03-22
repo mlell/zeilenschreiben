@@ -8,9 +8,19 @@
   import TypingArea from '../components/TypingArea.svelte';
   import { getConnection, type TypingSession as TypingSessionType } from '../../connections';
 
+  type PersistResultInput = {
+    sessionId: string;
+    studentName: string;
+    typedText: string;
+    successCount: number;
+    failureCount: number;
+    accuracy: number;
+  };
+
   export let session: TypingSessionType;
   export let studentName: string;
   export let onBack: () => void;
+  export let persistResult: ((input: PersistResultInput) => Promise<void>) | null = null;
 
   // Parse text into lines, filtering empty lines
   $: lines = session.text
@@ -122,16 +132,34 @@
     saveError = '';
 
     try {
-      const connection = getConnection();
       const fullTypedText = typedLines.join('\n');
-      await connection.saveStudentResult(
-        session.id,
+
+      // Keep result persistence configurable so self-practice can complete fully
+      // without network calls, while teacher-assigned sessions still report back.
+      // This preserves one shared typing runtime and keeps pedagogy rules identical.
+      // Defaulting to the backend path avoids breaking existing call sites.
+      const persist =
+        persistResult ??
+        (async (input: PersistResultInput): Promise<void> => {
+          const connection = getConnection();
+          await connection.saveStudentResult(
+            input.sessionId,
+            input.studentName,
+            input.typedText,
+            input.successCount,
+            input.failureCount,
+            input.accuracy
+          );
+        });
+
+      await persist({
+        sessionId: session.id,
         studentName,
-        fullTypedText,
+        typedText: fullTypedText,
         successCount,
         failureCount,
-        accuracy
-      );
+        accuracy,
+      });
     } catch (e) {
       saveError = e instanceof Error ? e.message : 'Fehler beim Speichern.';
     } finally {
@@ -200,10 +228,7 @@
     </div>
   </div>
 
-  <div class="mb-4 text-sm text-text-muted flex items-center justify-between">
-    <div>
-      Aufgaben-Code: <span class="font-mono font-bold">{session.code}</span>
-    </div>
+  <div class="mb-4 text-sm text-text-muted flex items-center justify-end">
     {#if hasTimeLimit && remainingSeconds !== null}
       <div class="px-3 py-1 rounded-md bg-surface-elevated text-text">
         Zeit übrig: <span class="font-mono font-bold">{formattedRemainingTime}</span>
