@@ -40,8 +40,9 @@
 </script>
 
 <div class="my-8">
-  <div class="text-lg text-text-muted mb-4">
-    Zeile {currentLineIndex + 1} von {lines.length}
+  <div class="text-lg text-text-muted mb-4 flex items-center gap-4">
+    <span class="text-success font-bold">{attempts.filter((a) => a).length} ✓</span>
+    <span class="text-error font-bold">{attempts.filter((a) => !a).length} ✗</span>
   </div>
 
   <div class="flex flex-col gap-4 my-8 bg-surface p-8 rounded-md">
