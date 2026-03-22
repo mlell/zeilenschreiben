@@ -79,6 +79,7 @@
     if (event.key === expectedChar) {
       typedText += event.key;
     } else {
+      typedText += event.key;
       hasError = true;
     }
   }
@@ -237,7 +238,7 @@
   </div>
 
   {#if !isComplete}
-    <TypingArea {lines} {currentLineIndex} {typedText} {hasError} {attempts} />
+    <TypingArea {lines} {currentLineIndex} {typedText} {hasError} {attempts} {typedLines} />
   {:else}
     <div class="mt-12">
       <h2 class="text-xl mb-8 text-text font-normal">Ergebnisse</h2>

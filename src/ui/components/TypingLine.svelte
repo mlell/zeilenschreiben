@@ -3,31 +3,42 @@
   Shows typed characters as bold, and displays error state with strikethrough.
 -->
 <script lang="ts">
+  import TypingLineOverlay from './TypingLineOverlay.svelte';
+
   /** The target text the user should type */
   export let targetText: string = '';
   /** What the user has typed so far */
   export let typedText: string = '';
   /** Whether the user made a typing error on this line */
   export let hasError: boolean = false;
+  /** Line mode controls semantic styling across active and inactive rows */
+  export let state: 'future' | 'current' | 'success' | 'failed' | 'past' = 'current';
 
   $: isComplete = typedText.length === targetText.length && !hasError;
 </script>
 
 <div class="inline-flex flex-col flex-1">
-  <div class="text-display font-mono text-lg" class:error={hasError}>
+  <div class="text-display font-mono text-lg" class:error={state === 'failed' || hasError} class:future={state === 'future'}>
     {#each targetText.split('') as char, i}
       <span
         class="char inline-block relative"
-        class:typed={i < typedText.length}
-        class:correct={i < typedText.length && typedText[i] === char}
-        class:cursor={i === typedText.length && !hasError && !isComplete}
+        class:typed={state === 'current' && i < typedText.length}
+        class:correct={i < typedText.length && typedText[i] === char && (state === 'current' || state === 'success')}
+        class:wrong={i < typedText.length && typedText[i] !== char && (state === 'current' || state === 'failed')}
+        class:cursor={state === 'current' && i === typedText.length && !hasError && !isComplete}
       >
-        {char === ' ' ? '\u00A0' : char}
-        {#if i === typedText.length && hasError}
-          <span class="message-bubble error-bubble" data-testid="error-bubble">ENTER drücken</span>
+        {#if i < typedText.length && typedText[i] !== char && (state === 'current' || state === 'failed')}
+          {typedText[i] === ' ' ? '\u00A0' : typedText[i]}
+        {:else}
+          {char === ' ' ? '\u00A0' : char}
         {/if}
-        {#if i === typedText.length - 1 && isComplete}
-          <span class="message-bubble success-bubble" data-testid="success-bubble">ENTER drücken</span>
+
+        {#if state === 'current' && i === typedText.length - 1 && hasError}
+          <TypingLineOverlay variant="error" />
+        {/if}
+
+        {#if state === 'current' && i === typedText.length - 1 && isComplete}
+          <TypingLineOverlay variant="success" />
         {/if}
       </span>
     {/each}
@@ -39,10 +50,19 @@
     letter-spacing: var(--letter-spacing-tight);
   }
 
+  .text-display.future {
+    opacity: 0.4;
+  }
+
   .char { color: var(--color-text-muted); }
   .char.correct { color: var(--color-success); font-weight: bold; }
+  .char.wrong {
+    color: var(--color-error);
+    font-weight: bold;
+    text-decoration: line-through;
+  }
 
-  /* Cursor indicator at current typing position */
+  /* Preserve exact caret alignment by anchoring to the active character node. */
   .char.cursor::after {
     content: '';
     position: absolute;
@@ -59,44 +79,13 @@
     51%, 100% { opacity: 0; }
   }
 
-  /* Message bubble positioned after cursor */
-  .message-bubble {
-    position: absolute;
-    left: 100%;
-    top: 50%;
-    transform: translateY(-50%);
-    margin-left: 0.5rem;
-    padding: 0.25rem 0.75rem;
-    border-radius: 1rem;
-    font-size: 0.75rem;
-    font-weight: bold;
-    white-space: nowrap;
-    z-index: 20;
-  }
-
-  .error-bubble {
-    background-color: var(--color-error);
-    color: white;
-  }
-
-  .success-bubble {
-    background-color: var(--color-success);
-    color: white;
-  }
-
   @media (prefers-color-scheme: dark) {
-    .error-bubble {
-      background-color: var(--color-error-muted);
+    .text-display.error {
+      color: var(--color-error-muted);
     }
-  }
 
-  /* Error state requires line-through which needs scoped style */
-  .text-display.error {
-    text-decoration: line-through;
-    color: var(--color-error);
-  }
-
-  @media (prefers-color-scheme: dark) {
-    .text-display.error { color: var(--color-error-muted); }
+    .char.wrong {
+      color: var(--color-error-muted);
+    }
   }
 </style>
