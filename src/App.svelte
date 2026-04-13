@@ -21,7 +21,7 @@
   onMount(() => {
     try {
       validateConfig();
-      initConnection(config.supabase.url, config.supabase.anonKey);
+      initConnection(config.postgrest.url);
       isBackendAvailable = true;
       isInitialized = true;
     } catch (e) {

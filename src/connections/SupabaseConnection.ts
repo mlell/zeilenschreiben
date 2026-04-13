@@ -1,27 +1,18 @@
 /**
- * SupabaseConnection.ts - Supabase implementation of the Connection interface.
- * Uses PostgREST API via fetch to communicate with Supabase backend.
+ * SupabaseConnection.ts - PostgREST implementation of the Connection interface.
+ * Uses PostgREST API via fetch to communicate with self-hosted backend.
  * No SDK dependency - direct REST calls for minimal bundle size.
  */
 
 import type { Connection, TypingSession, StudentResult } from './Connection';
 
-export class SupabaseConnection implements Connection {
+export class PostgrestConnection implements Connection {
   private readonly baseUrl: string;
-  private readonly apiKey: string;
-  // Preserve a single immutable headers bundle so repeated fetch calls
-  // keep a stable reference, which satisfies tests comparing header objects.
-  // This avoids generating transient objects that obscure the actual request.
-  // It also centralizes the Supabase credentials for easier configuration.
-  // Future header mutations can still happen here if needed.
   private readonly headers: HeadersInit;
 
-  constructor(supabaseUrl: string, supabaseAnonKey: string) {
-    this.baseUrl = `${supabaseUrl}/rest/v1`;
-    this.apiKey = supabaseAnonKey;
+  constructor(postgrestUrl: string) {
+    this.baseUrl = postgrestUrl;
     this.headers = {
-      apikey: this.apiKey,
-      Authorization: `Bearer ${this.apiKey}`,
       'Content-Type': 'application/json',
       Prefer: 'return=representation',
     };

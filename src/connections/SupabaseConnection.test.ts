@@ -3,33 +3,30 @@
  * Focuses on session creation, retrieval, and student result saving.
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { SupabaseConnection } from './SupabaseConnection';
+import { PostgrestConnection } from './SupabaseConnection';
 
 type MockFetch = ReturnType<typeof vi.fn>;
 
-describe('SupabaseConnection', () => {
-  const mockUrl = 'https://mock-supabase-url.supabase.co';
-  const mockKey = 'mock-anon-key';
-  let connection: SupabaseConnection;
+describe('PostgrestConnection', () => {
+  const mockUrl = 'http://localhost/api';
+  let connection: PostgrestConnection;
 
   beforeEach(() => {
-    connection = new SupabaseConnection(mockUrl, mockKey);
+    connection = new PostgrestConnection(mockUrl);
     vi.clearAllMocks();
   });
 
   // ========== CONSTRUCTOR AND CONFIGURATION ========== //
   describe('Constructor and configuration', () => {
-    it('initializes with correct base URL and API key', () => {
-      expect(connection).toBeInstanceOf(SupabaseConnection);
+    it('initializes with correct base URL', () => {
+      expect(connection).toBeInstanceOf(PostgrestConnection);
       // Note: We can't directly test private properties, but we can verify behavior
     });
 
-    it('generates correct headers for Supabase API', () => {
+    it('generates correct headers for PostgREST API', () => {
       // Access the headers through a method that uses them
       const headers = connection['headers'];
       expect(headers).toEqual({
-        apikey: mockKey,
-        Authorization: `Bearer ${mockKey}`,
         'Content-Type': 'application/json',
         Prefer: 'return=representation',
       });
@@ -140,7 +137,7 @@ describe('SupabaseConnection', () => {
 
       expect(fetch).toHaveBeenCalledTimes(1);
       expect(fetch).toHaveBeenCalledWith(
-        `${mockUrl}/rest/v1/typing_sessions?code=eq.ABC123&limit=1`,
+        `${mockUrl}/typing_sessions?code=eq.ABC123&limit=1`,
         {
           method: 'GET',
           headers: connection['headers'],
@@ -162,7 +159,7 @@ describe('SupabaseConnection', () => {
       await connection.getSessionByCode('  abc123  ');
 
       expect(fetch).toHaveBeenCalledWith(
-        `${mockUrl}/rest/v1/typing_sessions?code=eq.ABC123&limit=1`,
+        `${mockUrl}/typing_sessions?code=eq.ABC123&limit=1`,
         expect.any(Object)
       );
     });
@@ -224,7 +221,7 @@ describe('SupabaseConnection', () => {
       );
 
       expect(fetch).toHaveBeenCalledTimes(1);
-      expect(fetch).toHaveBeenCalledWith(`${mockUrl}/rest/v1/student_results`, {
+      expect(fetch).toHaveBeenCalledWith(`${mockUrl}/student_results`, {
         method: 'POST',
         headers: connection['headers'],
         body: JSON.stringify({
@@ -273,7 +270,7 @@ describe('SupabaseConnection', () => {
 
       expect(fetch).toHaveBeenCalledTimes(1);
       expect(fetch).toHaveBeenCalledWith(
-        `${mockUrl}/rest/v1/student_results?session_id=eq.session-1&order=completed_at.desc`,
+        `${mockUrl}/student_results?session_id=eq.session-1&order=completed_at.desc`,
         {
           method: 'GET',
           headers: connection['headers'],
@@ -393,7 +390,7 @@ describe('SupabaseConnection', () => {
       );
 
       expect(fetch).toHaveBeenCalledWith(
-        `${mockUrl}/rest/v1/student_results`,
+        `${mockUrl}/student_results`,
         expect.objectContaining({
           body: JSON.stringify({
             session_id: 'session-1',

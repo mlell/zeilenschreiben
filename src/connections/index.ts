@@ -4,19 +4,19 @@
  */
 
 export type { Connection, TypingSession, StudentResult } from './Connection';
-export { SupabaseConnection } from './SupabaseConnection';
+export { PostgrestConnection } from './SupabaseConnection';
 
 import type { Connection } from './Connection';
-import { SupabaseConnection } from './SupabaseConnection';
+import { PostgrestConnection } from './SupabaseConnection';
 
 let connectionInstance: Connection | null = null;
 
 /**
- * Initialize the connection with Supabase credentials.
+ * Initialize the connection with PostgREST API URL.
  * Must be called once at app startup before using getConnection().
  */
-export function initConnection(supabaseUrl: string, supabaseAnonKey: string): void {
-  connectionInstance = new SupabaseConnection(supabaseUrl, supabaseAnonKey);
+export function initConnection(postgrestUrl: string): void {
+  connectionInstance = new PostgrestConnection(postgrestUrl);
 }
 
 /**

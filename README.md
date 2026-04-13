@@ -1,43 +1,133 @@
-# Svelte + Vite
+# Zeilenschreiben
 
-This template should help get you started developing with Svelte in Vite.
+A web application for practicing touch typing with a focus on error-free line completion. Students type lines exactly as shown, and their accuracy is tracked by the percentage of error-free lines.
 
-## Recommended IDE Setup
+## Features
 
-[VS Code](https://code.visualstudio.com/) + [Svelte](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode).
+- **Teacher Mode**: Create typing sessions with custom text and optional time limits
+- **Student Mode**: Join sessions via code or practice independently
+- **Real-time Feedback**: Visual indicators for correct/incorrect typing
+- **Results Tracking**: View student performance and accuracy statistics
 
-## Need an official Svelte framework?
+## Tech Stack
 
-Check out [SvelteKit](https://github.com/sveltejs/kit#readme), which is also powered by Vite. Deploy anywhere with its serverless-first approach and adapt to various platforms, with out of the box support for TypeScript, SCSS, and Less, and easily-added support for mdsvex, GraphQL, PostCSS, Tailwind CSS, and more.
+- **Frontend**: Svelte + TypeScript + Vite
+- **Backend**: PostgreSQL 16 + PostgREST
+- **Deployment**: Docker Compose with nginx reverse proxy
+- **Styling**: TailwindCSS
 
-## Technical considerations
+## Setup
 
-**Why use this over SvelteKit?**
+### Prerequisites
 
-- It brings its own routing solution which might not be preferable for some users.
-- It is first and foremost a framework that just happens to use Vite under the hood, not a Vite app.
+- Docker and Docker Compose
+- Node.js 18+ (for local development)
 
-This template contains as little as possible to get started with Vite + Svelte, while taking into account the developer experience with regards to HMR and intellisense. It demonstrates capabilities on par with the other `create-vite` templates and is a good starting point for beginners dipping their toes into a Vite + Svelte project.
+### Environment Configuration
 
-Should you later need the extended capabilities and extensibility provided by SvelteKit, the template has been structured similarly to SvelteKit so that it is easy to migrate.
+1. Copy the example environment file:
+   ```bash
+   cp .env.example .env
+   ```
 
-**Why include `.vscode/extensions.json`?**
+2. Update `.env` with your configuration:
+   ```env
+   VITE_POSTGREST_URL=http://localhost/api
+   POSTGRES_PASSWORD=your_secure_password_here
+   PGRST_JWT_SECRET=
+   ```
 
-Other templates indirectly recommend extensions via the README, but this file allows VS Code to prompt the user to install the recommended extension upon opening the project.
+3. **Important**: Update the database password in `docker/postgres/init.sql`:
+   - Replace `your_password_here` with the same password from `POSTGRES_PASSWORD`
 
-**Why enable `checkJs` in the JS template?**
+### Local Development
 
-It is likely that most cases of changing variable types in runtime are likely to be accidental, rather than deliberate. This provides advanced typechecking out of the box. Should you like to take advantage of the dynamically-typed nature of JavaScript, it is trivial to change the configuration.
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-**Why is HMR not preserving my local component state?**
+2. Start the development server:
+   ```bash
+   npm run dev
+   ```
 
-HMR state preservation comes with a number of gotchas! It has been disabled by default in both `svelte-hmr` and `@sveltejs/vite-plugin-svelte` due to its often surprising behavior. You can read the details [here](https://github.com/sveltejs/svelte-hmr/tree/master/packages/svelte-hmr#preservation-of-local-state).
+3. Start the backend services:
+   ```bash
+   docker compose up -d postgres postgrest nginx
+   ```
 
-If you have state that's important to retain within a component, consider creating an external store which would not be replaced by HMR.
+### Production Deployment
 
-```js
-// store.js
-// An extremely simple external store
-import { writable } from 'svelte/store';
-export default writable(0);
+1. Build and start all services:
+   ```bash
+   docker compose up -d
+   ```
+
+2. The application will be available at `http://localhost`
+
+3. API endpoints are available at `http://localhost/api`
+
+## Architecture
+
+### Services
+
+- **postgres**: PostgreSQL 16 database with automatic schema initialization
+- **postgrest**: REST API layer for database access
+- **app**: Svelte frontend application
+- **nginx**: Reverse proxy with rate limiting
+
+### Rate Limiting
+
+- API endpoints: 60 requests/minute per IP (burst: 10)
+- Application: 10 requests/second per IP (burst: 20)
+- Exceeding limits returns HTTP 429 (Too Many Requests)
+
+### Database Schema
+
+- `typing_sessions`: Stores teacher-created sessions with codes
+- `student_results`: Stores student typing results and performance metrics
+
+## Development
+
+### Run Tests
+
+```bash
+npm test
+```
+
+### Build for Production
+
+```bash
+npm run build
+```
+
+### Database Management
+
+Access PostgreSQL directly:
+```bash
+docker compose exec postgres psql -U postgres -d zeilenschreiben
+```
+
+View PostgREST logs:
+```bash
+docker compose logs -f postgrest
+```
+
+## Monitoring
+
+- Health check: `http://localhost/health`
+- PostgreSQL: Port 5432 (localhost only)
+- nginx access logs: `docker compose logs nginx`
+
+## Backup
+
+Create database backup:
+```bash
+docker compose exec postgres pg_dump -U postgres zeilenschreiben > backup.sql
+```
+
+Restore from backup:
+```bash
+cat backup.sql | docker compose exec -T postgres psql -U postgres -d zeilenschreiben
 ```

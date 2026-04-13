@@ -15,9 +15,12 @@ RUN npm ci
 COPY . .
 
 # Build arguments (injected at build time)
-ARG VITE_SUPABASE_URL
-ARG VITE_SUPABASE_PUBLISHABLE_KEY
+ARG VITE_POSTGREST_URL
 ARG VITE_BASE_PATH=/
+
+# Set environment variables for Vite build
+ENV VITE_POSTGREST_URL=${VITE_POSTGREST_URL}
+ENV VITE_BASE_PATH=${VITE_BASE_PATH}
 
 # Build the application with environment variables
 RUN npm run build
