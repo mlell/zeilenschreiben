@@ -88,7 +88,9 @@ describe('TypingSession.svelte', () => {
       await fireEvent.keyDown(window, { key: 'c' });
 
       // Should show completion prompt
-      expect(screen.getByText('Zeile vollständig! Drücke ENTER für die nächste Zeile')).toBeTruthy();
+      expect(
+        screen.getByText('Zeile vollständig! Drücke ENTER für die nächste Zeile')
+      ).toBeTruthy();
 
       // Press Enter to advance
       await fireEvent.keyDown(window, { key: 'Enter' });
@@ -205,6 +207,85 @@ describe('TypingSession.svelte', () => {
       });
 
       expect(screen.queryByText('Zeit übrig:')).toBeNull();
+    });
+  });
+
+  describe('Countdown timeout', () => {
+    it('completes the session when countdown reaches zero', async () => {
+      vi.useFakeTimers();
+      const mockPersist = vi.fn().mockResolvedValue(undefined);
+      const timedSession = {
+        id: 'session-1',
+        code: 'ABC123',
+        text: 'abc\ndef',
+        time_limit_seconds: 2,
+        created_at: '2026-03-17T00:00:00Z',
+      };
+
+      render(TypingSession, {
+        props: {
+          session: timedSession,
+          studentName: 'Test Student',
+          onBack: mockOnBack,
+          persistResult: mockPersist,
+        },
+      });
+
+      await vi.advanceTimersByTimeAsync(3000);
+
+      expect(screen.getByText('Ergebnisse')).toBeTruthy();
+      expect(mockPersist).toHaveBeenCalledTimes(1);
+    });
+
+    it('records a partial attempt when timeout fires mid-line', async () => {
+      vi.useFakeTimers();
+      const mockPersist = vi.fn().mockResolvedValue(undefined);
+      const timedSession = {
+        id: 'session-1',
+        code: 'ABC123',
+        text: 'abc\ndef',
+        time_limit_seconds: 2,
+        created_at: '2026-03-17T00:00:00Z',
+      };
+
+      render(TypingSession, {
+        props: {
+          session: timedSession,
+          studentName: 'Test Student',
+          onBack: mockOnBack,
+          persistResult: mockPersist,
+        },
+      });
+
+      await fireEvent.keyDown(window, { key: 'a' });
+      await vi.advanceTimersByTimeAsync(3000);
+
+      expect(mockPersist).toHaveBeenCalledTimes(1);
+    });
+
+    it('decrements the timer each second', async () => {
+      vi.useFakeTimers();
+      const timedSession = {
+        id: 'session-1',
+        code: 'ABC123',
+        text: 'abc',
+        time_limit_seconds: 60,
+        created_at: '2026-03-17T00:00:00Z',
+      };
+
+      render(TypingSession, {
+        props: {
+          session: timedSession,
+          studentName: 'Test Student',
+          onBack: mockOnBack,
+          persistResult: vi.fn().mockResolvedValue(undefined),
+        },
+      });
+
+      expect(screen.getByText('1:00')).toBeTruthy();
+
+      await vi.advanceTimersByTimeAsync(1000);
+      expect(screen.getByText('0:59')).toBeTruthy();
     });
   });
 
