@@ -7,7 +7,7 @@
     "frontendDist": "../dist"
   },
   "productName": "Zeilenschreiben",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "identifier": "de.zeilenschreiben.app",
   "plugins": {},
   "bundle": {
