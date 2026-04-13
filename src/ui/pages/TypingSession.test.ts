@@ -214,13 +214,7 @@ describe('TypingSession.svelte', () => {
     it('completes the session when countdown reaches zero', async () => {
       vi.useFakeTimers();
       const mockPersist = vi.fn().mockResolvedValue(undefined);
-      const timedSession = {
-        id: 'session-1',
-        code: 'ABC123',
-        text: 'abc\ndef',
-        time_limit_seconds: 2,
-        created_at: '2026-03-17T00:00:00Z',
-      };
+      const timedSession = { ...mockSession, time_limit_seconds: 2 };
 
       render(TypingSession, {
         props: {
@@ -240,13 +234,7 @@ describe('TypingSession.svelte', () => {
     it('records a partial attempt when timeout fires mid-line', async () => {
       vi.useFakeTimers();
       const mockPersist = vi.fn().mockResolvedValue(undefined);
-      const timedSession = {
-        id: 'session-1',
-        code: 'ABC123',
-        text: 'abc\ndef',
-        time_limit_seconds: 2,
-        created_at: '2026-03-17T00:00:00Z',
-      };
+      const timedSession = { ...mockSession, time_limit_seconds: 2 };
 
       render(TypingSession, {
         props: {
@@ -261,17 +249,12 @@ describe('TypingSession.svelte', () => {
       await vi.advanceTimersByTimeAsync(3000);
 
       expect(mockPersist).toHaveBeenCalledTimes(1);
+      expect(mockPersist).toHaveBeenCalledWith(expect.objectContaining({ sessionId: 'session-1' }));
     });
 
     it('decrements the timer each second', async () => {
       vi.useFakeTimers();
-      const timedSession = {
-        id: 'session-1',
-        code: 'ABC123',
-        text: 'abc',
-        time_limit_seconds: 60,
-        created_at: '2026-03-17T00:00:00Z',
-      };
+      const timedSession = { ...mockSession, text: 'abc', time_limit_seconds: 60 };
 
       render(TypingSession, {
         props: {
