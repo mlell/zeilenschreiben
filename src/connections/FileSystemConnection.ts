@@ -1,7 +1,7 @@
 /**
  * FileSystemConnection.ts - Desktop mode connection implementation.
- * Loads typing sessions from markdown files via Tauri filesystem commands.
- * Does not support session creation or result persistence (desktop is student-only).
+ * Loads and creates typing sessions as markdown files via Tauri filesystem commands.
+ * Does not support result persistence (results are displayed locally only).
  */
 
 import { invoke } from '@tauri-apps/api/core';
@@ -63,10 +63,24 @@ export class FileSystemConnection implements Connection {
   }
 
   /**
-   * Not supported in desktop mode - sessions are file-based.
+   * Create a new session by writing a markdown file.
+   * @param text - Session content (lines separated by newlines)
+   * @param timeLimitSeconds - Optional time limit in seconds
+   * @returns Created session object
    */
-  async createSession(_text: string, _timeLimitSeconds: number | null): Promise<TypingSession> {
-    throw new Error('Session creation not supported in desktop mode. Use markdown files instead.');
+  async createSession(text: string, timeLimitSeconds: number | null): Promise<TypingSession> {
+    const fileData = await invoke<SessionFileData>('create_session_file', {
+      text,
+      time_limit_seconds: timeLimitSeconds,
+    });
+
+    return {
+      id: fileData.code,
+      code: fileData.code,
+      text: fileData.lines.join('\n'),
+      created_at: new Date().toISOString(),
+      time_limit_seconds: fileData.time_limit,
+    };
   }
 
   /**

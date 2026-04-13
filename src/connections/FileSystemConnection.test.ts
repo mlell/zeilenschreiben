@@ -95,9 +95,53 @@ describe('FileSystemConnection', () => {
   });
 
   describe('createSession', () => {
-    it('should throw error as not supported in desktop mode', async () => {
+    it('should create a markdown file with session content and return TypingSession', async () => {
+      const mockCreatedSession = {
+        code: 'TEST01',
+        time_limit: 300,
+        lines: ['Line 1', 'Line 2'],
+      };
+
+      mockInvoke.mockResolvedValue(mockCreatedSession);
+
+      const result = await connection.createSession('Line 1\nLine 2', 300);
+
+      expect(mockInvoke).toHaveBeenCalledWith('create_session_file', {
+        text: 'Line 1\nLine 2',
+        time_limit_seconds: 300,
+      });
+      expect(result).toEqual({
+        id: 'TEST01',
+        code: 'TEST01',
+        text: 'Line 1\nLine 2',
+        created_at: expect.any(String),
+        time_limit_seconds: 300,
+      });
+    });
+
+    it('should create session without time limit', async () => {
+      const mockCreatedSession = {
+        code: 'NOTIME1',
+        time_limit: null,
+        lines: ['Line 1'],
+      };
+
+      mockInvoke.mockResolvedValue(mockCreatedSession);
+
+      const result = await connection.createSession('Line 1', null);
+
+      expect(mockInvoke).toHaveBeenCalledWith('create_session_file', {
+        text: 'Line 1',
+        time_limit_seconds: null,
+      });
+      expect(result?.time_limit_seconds).toBeNull();
+    });
+
+    it('should throw error if file creation fails', async () => {
+      mockInvoke.mockRejectedValue(new Error('Failed to write session file'));
+
       await expect(connection.createSession('text', 300)).rejects.toThrow(
-        'Session creation not supported in desktop mode'
+        'Failed to write session file'
       );
     });
   });

@@ -1,6 +1,6 @@
 mod commands;
 
-use commands::{get_sessions_directory, read_session_file};
+use commands::{create_session_file, get_sessions_directory, read_session_file};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -17,7 +17,8 @@ pub fn run() {
         })
         .invoke_handler(tauri::generate_handler![
             read_session_file,
-            get_sessions_directory
+            get_sessions_directory,
+            create_session_file
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
