@@ -14,8 +14,9 @@ describe('TypingArea', () => {
   it('displays progress indicator with current line number', () => {
     render(TypingArea, { props: defaultProps });
 
-    // Progress should show "Zeile 3 von 5" (1-indexed)
-    expect(screen.getByText('Zeile 3 von 5')).toBeDefined();
+    // Should display success and failure counts
+    expect(screen.getByText('1 ✓')).toBeDefined();
+    expect(screen.getByText('1 ✗')).toBeDefined();
   });
 
   it('shows correct instruction based on typing state', () => {
