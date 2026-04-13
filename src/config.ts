@@ -10,11 +10,10 @@ export const config = {
 };
 
 /**
- * Validate that required environment variables are set.
- * @throws Error if any required config is missing
+ * Validate configuration. PostgREST URL is optional to allow offline/desktop mode.
+ * Teacher features require a configured PostgREST backend.
  */
 export function validateConfig(): void {
-  if (!config.postgrest.url) {
-    throw new Error('VITE_POSTGREST_URL environment variable is required');
-  }
+  // No required config in development - app works in offline mode with FileSystemConnection
+  // Teacher features will be unavailable if postgrestUrl is not set
 }

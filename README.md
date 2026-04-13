@@ -26,11 +26,13 @@ A web application for practicing touch typing with a focus on error-free line co
 ### Environment Configuration
 
 1. Copy the example environment file:
+
    ```bash
    cp .env.example .env
    ```
 
 2. Update `.env` with your configuration:
+
    ```env
    VITE_POSTGREST_URL=http://localhost/api
    POSTGRES_PASSWORD=your_secure_password_here
@@ -43,11 +45,13 @@ A web application for practicing touch typing with a focus on error-free line co
 ### Local Development
 
 1. Install dependencies:
+
    ```bash
    npm install
    ```
 
 2. Start the development server:
+
    ```bash
    npm run dev
    ```
@@ -60,6 +64,7 @@ A web application for practicing touch typing with a focus on error-free line co
 ### Production Deployment
 
 1. Build and start all services:
+
    ```bash
    docker compose up -d
    ```
@@ -67,6 +72,27 @@ A web application for practicing touch typing with a focus on error-free line co
 2. The application will be available at `http://localhost`
 
 3. API endpoints are available at `http://localhost/api`
+
+### Desktop Deployment
+
+Build desktop installers for offline use:
+
+1. Build the desktop app:
+
+   ```bash
+   npm run tauri:build
+   ```
+
+2. Installers are created in `src-tauri/target/release/bundle/`:
+   - Linux: `.AppImage`, `.deb`
+   - Windows: `.msi`, `.exe`
+   - macOS: `.dmg`, `.app`
+
+3. Distribute installer with `sessions/` folder containing session files
+
+4. Students place the app and sessions folder together, then run the app
+
+See `docs/DESKTOP_DEPLOYMENT.md` for detailed instructions.
 
 ## Architecture
 
@@ -105,11 +131,13 @@ npm run build
 ### Database Management
 
 Access PostgreSQL directly:
+
 ```bash
 docker compose exec postgres psql -U postgres -d zeilenschreiben
 ```
 
 View PostgREST logs:
+
 ```bash
 docker compose logs -f postgrest
 ```
@@ -123,11 +151,13 @@ docker compose logs -f postgrest
 ## Backup
 
 Create database backup:
+
 ```bash
 docker compose exec postgres pg_dump -U postgres zeilenschreiben > backup.sql
 ```
 
 Restore from backup:
+
 ```bash
 cat backup.sql | docker compose exec -T postgres psql -U postgres -d zeilenschreiben
 ```

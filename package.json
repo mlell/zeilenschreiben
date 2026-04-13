@@ -12,12 +12,15 @@
     "lint": "prettier --ignore-path .gitignore --ignore-path .prettierignore --check . && eslint . && svelte-check --tsconfig ./tsconfig.json",
     "format": "prettier --write .",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "tauri:dev": "tauri dev",
+    "tauri:build": "tauri build"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@sveltejs/vite-plugin-svelte": "^6.2.4",
     "@tailwindcss/vite": "^4.2.1",
+    "@tauri-apps/cli": "^2.10.1",
     "@testing-library/svelte": "^5.3.1",
     "@types/eslint__js": "^8.42.3",
     "@vitest/coverage-v8": "^4.1.0",
@@ -36,6 +39,7 @@
     "vitest": "^4.0.18"
   },
   "dependencies": {
+    "@tauri-apps/api": "^2.10.1",
     "playwright": "^1.58.2",
     "pm2": "^6.0.14",
     "tailwindcss": "^4.2.1"

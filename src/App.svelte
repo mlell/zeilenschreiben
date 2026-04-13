@@ -5,23 +5,32 @@
 -->
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { initConnection } from './connections';
-  import { config, validateConfig } from './config';
+  import { setConnectionContext, type Connection } from './connections';
+  import { validateConfig } from './config';
   import Layout from './ui/components/Layout.svelte';
   import TeacherPage from './ui/pages/TeacherPage.svelte';
   import StudentForm from './ui/pages/StudentForm.svelte';
 
+  interface Props {
+    connection: Connection;
+  }
+
+  let { connection }: Props = $props();
+
+  $effect(() => {
+    setConnectionContext(connection);
+  });
+
   type Page = 'home' | 'teacher' | 'student';
 
-  let currentPage: Page = 'home';
-  let backendWarning: string = '';
-  let isInitialized: boolean = false;
-  let isBackendAvailable: boolean = false;
+  let currentPage: Page = $state('home');
+  let backendWarning: string = $state('');
+  let isInitialized: boolean = $state(false);
+  let isBackendAvailable: boolean = $state(false);
 
   onMount(() => {
     try {
       validateConfig();
-      initConnection(config.postgrest.url);
       isBackendAvailable = true;
       isInitialized = true;
     } catch (e) {
@@ -64,7 +73,7 @@
   <Layout width="wide">
     <div class="mb-4">
       <button
-        on:click={() => navigate('home')}
+        onclick={() => navigate('home')}
         class="text-sm text-text-muted hover:text-text transition-colors cursor-pointer"
       >
         ← Zurück zur Startseite
