@@ -6,7 +6,9 @@
 <script lang="ts">
   import { onDestroy, onMount } from 'svelte';
   import TypingArea from '../components/TypingArea.svelte';
-  import { getConnection, type TypingSession as TypingSessionType } from '../../connections';
+  import { getConnectionContext, type TypingSession as TypingSessionType } from '../../connections';
+
+  const connection = getConnectionContext();
 
   type PersistResultInput = {
     sessionId: string;
@@ -45,11 +47,10 @@
   $: currentLine = lines[currentLineIndex] || '';
   $: hasTimeLimit = session.time_limit_seconds !== null && session.time_limit_seconds > 0;
   export let formattedRemainingTime: string = '';
-  $: formattedRemainingTime = remainingSeconds === null
-    ? ''
-    : `${Math.floor(remainingSeconds / 60)}:${String(remainingSeconds % 60).padStart(2, '0')}`;
-
-  
+  $: formattedRemainingTime =
+    remainingSeconds === null
+      ? ''
+      : `${Math.floor(remainingSeconds / 60)}:${String(remainingSeconds % 60).padStart(2, '0')}`;
 
   // Input Processing - enforces "no backspace" pedagogy
   function handleKeyDown(event: KeyboardEvent): void {
@@ -142,7 +143,6 @@
       const persist =
         persistResult ??
         (async (input: PersistResultInput): Promise<void> => {
-          const connection = getConnection();
           await connection.saveStudentResult(
             input.sessionId,
             input.studentName,
@@ -222,71 +222,71 @@
   </button>
 </div>
 
-  <!-- Student Name Display - prominent positioning -->
-  <div class="mb-6 p-4 bg-primary/10 border border-primary/30 rounded-lg">
-    <div class="text-2xl font-semibold text-primary">
-      {studentName}
-    </div>
+<!-- Student Name Display - prominent positioning -->
+<div class="mb-6 p-4 bg-primary/10 border border-primary/30 rounded-lg">
+  <div class="text-2xl font-semibold text-primary">
+    {studentName}
   </div>
+</div>
 
-  <div class="mb-4 text-sm text-text-muted flex items-center justify-end">
-    {#if hasTimeLimit && remainingSeconds !== null}
-      <div class="px-3 py-1 rounded-md bg-surface-elevated text-text">
-        Zeit übrig: <span class="font-mono font-bold">{formattedRemainingTime}</span>
-      </div>
-    {/if}
-  </div>
-
-  {#if !isComplete}
-    <TypingArea {lines} {currentLineIndex} {typedText} {hasError} {attempts} {typedLines} />
-  {:else}
-    <div class="mt-12">
-      <h2 class="text-xl mb-8 text-text font-normal">Ergebnisse</h2>
-
-      {#if isSaving}
-        <div class="p-4 bg-surface-elevated rounded-md text-text-muted mb-8">
-          Ergebnisse werden gespeichert...
-        </div>
-      {:else if saveError}
-        <div class="p-4 bg-error/10 border border-error rounded-md text-error mb-8">
-          {saveError}
-        </div>
-      {:else}
-        <div class="p-4 bg-success/10 border border-success/30 rounded-md text-success mb-8">
-          Ergebnisse wurden gespeichert!
-        </div>
-      {/if}
-
-      <div class="flex justify-around my-8 gap-8">
-        <div class="flex-1 p-6 bg-surface-elevated rounded-md">
-          <div class="text-5xl font-bold mb-2 text-success">{successCount}</div>
-          <div class="text-base text-text-muted">Erfolgreich</div>
-        </div>
-
-        <div class="flex-1 p-6 bg-surface-elevated rounded-md">
-          <div class="text-5xl font-bold mb-2 text-error">{failureCount}</div>
-          <div class="text-base text-text-muted">Fehler</div>
-        </div>
-
-        <div class="flex-1 p-6 bg-surface-elevated rounded-md">
-          <div class="text-5xl font-bold mb-2 text-primary">{accuracy}%</div>
-          <div class="text-base text-text-muted">Genauigkeit</div>
-        </div>
-      </div>
-
-      <div class="flex gap-4">
-        <button
-          class="px-8 py-4 text-lg bg-primary text-white border-none rounded-md cursor-pointer transition-colors duration-300 hover:bg-primary-hover"
-          on:click={restart}
-        >
-          Nochmal versuchen
-        </button>
-        <button
-          class="px-8 py-4 text-lg bg-surface border border-border text-text rounded-md cursor-pointer transition-colors duration-300 hover:bg-surface-elevated"
-          on:click={onBack}
-        >
-          Andere Session
-        </button>
-      </div>
+<div class="mb-4 text-sm text-text-muted flex items-center justify-end">
+  {#if hasTimeLimit && remainingSeconds !== null}
+    <div class="px-3 py-1 rounded-md bg-surface-elevated text-text">
+      Zeit übrig: <span class="font-mono font-bold">{formattedRemainingTime}</span>
     </div>
   {/if}
+</div>
+
+{#if !isComplete}
+  <TypingArea {lines} {currentLineIndex} {typedText} {hasError} {attempts} {typedLines} />
+{:else}
+  <div class="mt-12">
+    <h2 class="text-xl mb-8 text-text font-normal">Ergebnisse</h2>
+
+    {#if isSaving}
+      <div class="p-4 bg-surface-elevated rounded-md text-text-muted mb-8">
+        Ergebnisse werden gespeichert...
+      </div>
+    {:else if saveError}
+      <div class="p-4 bg-error/10 border border-error rounded-md text-error mb-8">
+        {saveError}
+      </div>
+    {:else}
+      <div class="p-4 bg-success/10 border border-success/30 rounded-md text-success mb-8">
+        Ergebnisse wurden gespeichert!
+      </div>
+    {/if}
+
+    <div class="flex justify-around my-8 gap-8">
+      <div class="flex-1 p-6 bg-surface-elevated rounded-md">
+        <div class="text-5xl font-bold mb-2 text-success">{successCount}</div>
+        <div class="text-base text-text-muted">Erfolgreich</div>
+      </div>
+
+      <div class="flex-1 p-6 bg-surface-elevated rounded-md">
+        <div class="text-5xl font-bold mb-2 text-error">{failureCount}</div>
+        <div class="text-base text-text-muted">Fehler</div>
+      </div>
+
+      <div class="flex-1 p-6 bg-surface-elevated rounded-md">
+        <div class="text-5xl font-bold mb-2 text-primary">{accuracy}%</div>
+        <div class="text-base text-text-muted">Genauigkeit</div>
+      </div>
+    </div>
+
+    <div class="flex gap-4">
+      <button
+        class="px-8 py-4 text-lg bg-primary text-white border-none rounded-md cursor-pointer transition-colors duration-300 hover:bg-primary-hover"
+        on:click={restart}
+      >
+        Nochmal versuchen
+      </button>
+      <button
+        class="px-8 py-4 text-lg bg-surface border border-border text-text rounded-md cursor-pointer transition-colors duration-300 hover:bg-surface-elevated"
+        on:click={onBack}
+      >
+        Andere Session
+      </button>
+    </div>
+  </div>
+{/if}

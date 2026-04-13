@@ -4,9 +4,11 @@
   then loads the session and transitions to the typing interface.
 -->
 <script lang="ts">
-  import { getConnection, type TypingSession as SessionData } from '../../connections';
+  import { getConnectionContext, type TypingSession as SessionData } from '../../connections';
   import Layout from '../components/Layout.svelte';
   import TypingSessionView from './TypingSession.svelte';
+
+  const connection = getConnectionContext();
 
   type PracticeMode = 'code' | 'self';
 
@@ -57,7 +59,6 @@
   }
 
   async function persistToBackend(input: PersistResultInput): Promise<void> {
-    const connection = getConnection();
     await connection.saveStudentResult(
       input.sessionId,
       input.studentName,
@@ -84,13 +85,17 @@
   }
 
   function validateCodeJoinInput(trimmedCode: string): string | null {
-    if (!backendAvailable) return 'Server ist nicht verfügbar. Bitte nutzen Sie Selbstständig Üben.';
+    if (!backendAvailable)
+      return 'Server ist nicht verfügbar. Bitte nutzen Sie Selbstständig Üben.';
     if (!trimmedCode) return 'Bitte geben Sie einen Code ein.';
     if (trimmedCode.length !== 6) return 'Der Code muss 6 Zeichen lang sein.';
     return null;
   }
 
-  function validateSelfPracticeInput(trimmedText: string, timeLimitMinutes: number | null): string | null {
+  function validateSelfPracticeInput(
+    trimmedText: string,
+    timeLimitMinutes: number | null
+  ): string | null {
     if (!trimmedText) return 'Bitte geben Sie einen Übungstext ein.';
 
     if (timeLimitMinutes !== null) {
@@ -130,7 +135,6 @@
 
     try {
       if (mode === 'code') {
-        const connection = getConnection();
         const loadedSession = await connection.getSessionByCode(trimmedCode);
 
         if (!loadedSession) {
@@ -187,9 +191,7 @@
 {:else}
   <Layout width="narrow">
     <h1 class="text-4xl mb-8 text-text font-normal text-center">Zeilenschreiben</h1>
-    <p class="text-center text-text-muted mb-12">
-      Übung macht den Meister – Zeile für Zeile.
-    </p>
+    <p class="text-center text-text-muted mb-12">Übung macht den Meister – Zeile für Zeile.</p>
 
     <div class="space-y-6">
       <div>
@@ -198,18 +200,22 @@
           <button
             type="button"
             on:click={() => handleModeChange('code')}
-            class={`px-4 py-3 rounded-md border text-left transition-colors ${mode === 'code'
-              ? 'border-primary bg-primary/10 text-primary'
-              : 'border-border bg-surface text-text hover:bg-surface-elevated'}`}
+            class={`px-4 py-3 rounded-md border text-left transition-colors ${
+              mode === 'code'
+                ? 'border-primary bg-primary/10 text-primary'
+                : 'border-border bg-surface text-text hover:bg-surface-elevated'
+            }`}
           >
             Mit Code beitreten
           </button>
           <button
             type="button"
             on:click={() => handleModeChange('self')}
-            class={`px-4 py-3 rounded-md border text-left transition-colors ${mode === 'self'
-              ? 'border-primary bg-primary/10 text-primary'
-              : 'border-border bg-surface text-text hover:bg-surface-elevated'}`}
+            class={`px-4 py-3 rounded-md border text-left transition-colors ${
+              mode === 'self'
+                ? 'border-primary bg-primary/10 text-primary'
+                : 'border-border bg-surface text-text hover:bg-surface-elevated'
+            }`}
           >
             Selbstständig Üben
           </button>
@@ -219,9 +225,7 @@
       {#if mode === 'code'}
         <!-- Name Input -->
         <div>
-          <label for="name-input" class="block text-lg mb-2 text-text">
-            Dein Name
-          </label>
+          <label for="name-input" class="block text-lg mb-2 text-text"> Dein Name </label>
           <input
             id="name-input"
             type="text"
@@ -236,82 +240,80 @@
         </div>
       {/if}
 
-    {#if mode === 'code'}
-      <!-- Code Input -->
-      <div>
-        <label for="code-input" class="block text-lg mb-2 text-text">
-          Aufgaben-Code
-        </label>
-        <input
-          id="code-input"
-          type="text"
-          bind:value={code}
-          on:keydown={handleKeyDown}
-          placeholder="z.B. ABC123"
-          maxlength="6"
-          class="w-full p-4 text-2xl font-mono text-center tracking-widest uppercase bg-surface border border-border rounded-md text-text focus:outline-none focus:border-primary"
-          disabled={isLoading || !backendAvailable}
-          autocomplete="off"
-          autocapitalize="characters"
-        />
-        {#if backendAvailable}
-          <p class="mt-2 text-sm text-text-muted text-center">
-            Fragen Sie Ihren Lehrer nach dem Code.
-          </p>
-        {:else}
-          <p class="mt-2 text-sm text-error text-center">
-            Server nicht verfügbar. Bitte wechseln Sie zu Selbstständig Üben.
-          </p>
-        {/if}
-      </div>
-    {:else}
-      <div>
-        <label for="self-text-input" class="block text-lg mb-2 text-text">
-          Übungstext
-        </label>
-        <textarea
-          id="self-text-input"
-          bind:value={selfPracticeText}
-          placeholder="Schreiben Sie hier den Text, den Sie üben möchten..."
-          rows="8"
-          class="w-full p-4 text-base bg-surface border border-border rounded-md text-text resize-y focus:outline-none focus:border-primary"
-          disabled={isLoading}
-        ></textarea>
-        <p class="mt-2 text-sm text-text-muted">
-          Jede Zeile wird einzeln zum Tippen angezeigt.
-        </p>
-      </div>
+      {#if mode === 'code'}
+        <!-- Code Input -->
+        <div>
+          <label for="code-input" class="block text-lg mb-2 text-text"> Aufgaben-Code </label>
+          <input
+            id="code-input"
+            type="text"
+            bind:value={code}
+            on:keydown={handleKeyDown}
+            placeholder="z.B. ABC123"
+            maxlength="6"
+            class="w-full p-4 text-2xl font-mono text-center tracking-widest uppercase bg-surface border border-border rounded-md text-text focus:outline-none focus:border-primary"
+            disabled={isLoading || !backendAvailable}
+            autocomplete="off"
+            autocapitalize="characters"
+          />
+          {#if backendAvailable}
+            <p class="mt-2 text-sm text-text-muted text-center">
+              Fragen Sie Ihren Lehrer nach dem Code.
+            </p>
+          {:else}
+            <p class="mt-2 text-sm text-error text-center">
+              Server nicht verfügbar. Bitte wechseln Sie zu Selbstständig Üben.
+            </p>
+          {/if}
+        </div>
+      {:else}
+        <div>
+          <label for="self-text-input" class="block text-lg mb-2 text-text"> Übungstext </label>
+          <textarea
+            id="self-text-input"
+            bind:value={selfPracticeText}
+            placeholder="Schreiben Sie hier den Text, den Sie üben möchten..."
+            rows="8"
+            class="w-full p-4 text-base bg-surface border border-border rounded-md text-text resize-y focus:outline-none focus:border-primary"
+            disabled={isLoading}
+          ></textarea>
+          <p class="mt-2 text-sm text-text-muted">Jede Zeile wird einzeln zum Tippen angezeigt.</p>
+        </div>
 
-      <div>
-        <label for="self-time-limit-input" class="block text-lg mb-2 text-text">
-          Zeitlimit (Minuten, optional)
-        </label>
-        <input
-          id="self-time-limit-input"
-          type="number"
-          min="1"
-          step="1"
-          bind:value={selfPracticeTimeLimitMinutesInput}
-          placeholder="z.B. 5"
-          class="w-full max-w-xs p-4 text-lg bg-surface border border-border rounded-md text-text focus:outline-none focus:border-primary"
-          disabled={isLoading}
-        />
-      </div>
-    {/if}
+        <div>
+          <label for="self-time-limit-input" class="block text-lg mb-2 text-text">
+            Zeitlimit (Minuten, optional)
+          </label>
+          <input
+            id="self-time-limit-input"
+            type="number"
+            min="1"
+            step="1"
+            bind:value={selfPracticeTimeLimitMinutesInput}
+            placeholder="z.B. 5"
+            class="w-full max-w-xs p-4 text-lg bg-surface border border-border rounded-md text-text focus:outline-none focus:border-primary"
+            disabled={isLoading}
+          />
+        </div>
+      {/if}
 
-    {#if error}
-      <div class="p-4 bg-error/10 border border-error rounded-md text-error text-center">
-        {error}
-      </div>
-    {/if}
+      {#if error}
+        <div class="p-4 bg-error/10 border border-error rounded-md text-error text-center">
+          {error}
+        </div>
+      {/if}
 
-    <button
-      on:click={handleSubmit}
-      disabled={isLoading}
-      class="w-full px-8 py-4 text-lg bg-primary text-white border-none rounded-md cursor-pointer transition-colors duration-300 hover:bg-primary-hover disabled:opacity-50 disabled:cursor-not-allowed"
-    >
-      {isLoading ? 'Wird geladen...' : mode === 'code' ? 'Mit Code starten' : 'Selbstständig starten'}
-    </button>
+      <button
+        on:click={handleSubmit}
+        disabled={isLoading}
+        class="w-full px-8 py-4 text-lg bg-primary text-white border-none rounded-md cursor-pointer transition-colors duration-300 hover:bg-primary-hover disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        {isLoading
+          ? 'Wird geladen...'
+          : mode === 'code'
+            ? 'Mit Code starten'
+            : 'Selbstständig starten'}
+      </button>
     </div>
 
     <button

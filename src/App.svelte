@@ -5,11 +5,19 @@
 -->
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { initConnection } from './connections';
-  import { config, validateConfig } from './config';
+  import { setConnectionContext, type Connection } from './connections';
+  import { validateConfig } from './config';
   import Layout from './ui/components/Layout.svelte';
   import TeacherPage from './ui/pages/TeacherPage.svelte';
   import StudentForm from './ui/pages/StudentForm.svelte';
+
+  interface Props {
+    connection: Connection;
+  }
+
+  let { connection }: Props = $props();
+
+  setConnectionContext(connection);
 
   type Page = 'home' | 'teacher' | 'student';
 
@@ -21,7 +29,6 @@
   onMount(() => {
     try {
       validateConfig();
-      initConnection(config.postgrest.url);
       isBackendAvailable = true;
       isInitialized = true;
     } catch (e) {

@@ -4,8 +4,10 @@
   then proceed to the typing interface once the session is loaded.
 -->
 <script lang="ts">
-  import { getConnection, type TypingSession as SessionData } from '../../connections';
+  import { getConnectionContext, type TypingSession as SessionData } from '../../connections';
   import TypingSessionView from './TypingSession.svelte';
+
+  const connection = getConnectionContext();
 
   // Entry form state
   let studentName: string = '';
@@ -47,7 +49,6 @@
     error = '';
 
     try {
-      const connection = getConnection();
       const loadedSession = await connection.getSessionByCode(trimmedCode);
 
       if (!loadedSession) {
@@ -85,9 +86,7 @@
     <div class="space-y-6">
       <!-- Name Input -->
       <div>
-        <label for="name-input" class="block text-lg mb-2 text-text">
-          Dein Name
-        </label>
+        <label for="name-input" class="block text-lg mb-2 text-text"> Dein Name </label>
         <input
           id="name-input"
           type="text"
@@ -103,9 +102,7 @@
 
       <!-- Code Input -->
       <div>
-        <label for="code-input" class="block text-lg mb-2 text-text">
-          Aufgaben-Code
-        </label>
+        <label for="code-input" class="block text-lg mb-2 text-text"> Aufgaben-Code </label>
         <input
           id="code-input"
           type="text"
