@@ -1,4 +1,5 @@
 ---
+title: Wiki content standards
 permalink: wiki-content-standards
 ---
 

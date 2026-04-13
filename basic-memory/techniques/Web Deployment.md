@@ -1,10 +1,10 @@
 ---
 title: Deployment Guide
 type: note
-permalink: basic-memory/deployment-guide
+permalink: deployment-guide
 ---
 
-# Deployment Guide
+# Web Deployment
 
 Self-hosted deployment using Docker Compose with PostgreSQL + PostgREST backend.
 

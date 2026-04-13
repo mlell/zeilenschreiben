@@ -1,3 +1,8 @@
+---
+title: Coding standards
+permalink: coding-standards
+---
+
 - Each file in `src/domain`, `src/services`, `src/connections`, `src/ui/components`, `src/ui/
 - Write the code in a narrative way, similar to literal programming. Like a 
   teacher explaining a concept, organise the code from general to technical:

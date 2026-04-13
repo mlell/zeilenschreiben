@@ -1,7 +1,7 @@
 ---
 title: Domain Model
 type: note
-permalink: basic-memory/domain-model
+permalink: domain-model
 tags:
   - domain
   - entities

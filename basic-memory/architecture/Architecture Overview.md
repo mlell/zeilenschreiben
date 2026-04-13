@@ -1,7 +1,7 @@
 ---
 title: Architecture Overview
 type: note
-permalink: basic-memory/architecture-overview
+permalink: architecture-overview
 tags:
   - architecture
   - design
@@ -52,7 +52,15 @@ Touch typing grading web application built with Svelte + PostgreSQL + PostgREST,
   - API: 60 req/min per IP
   - App: 10 req/sec per IP
 
+
+## Deployment Modes
+
+- **Web Mode**: PostgreSQL + PostgREST backend, full teacher/student features
+- **Desktop Mode**: Tauri app with file-based sessions, student-only (no result persistence)
+
 ---
 
 relates_to [[MVP Scope]]
 relates_to [[Domain Model]]
+supports [[Desktop Deployment]]
+uses [[Connection Abstraction Layer]]
