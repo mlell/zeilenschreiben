@@ -95,6 +95,24 @@ describe('TeacherPage', () => {
       });
     });
 
+    it('shows error when loading results fails', async () => {
+      mockGetSessionByCode.mockResolvedValue({
+        id: 'session-1',
+        code: 'ABC123',
+        text: 'Hallo',
+        created_at: '2026-01-01T00:00:00Z',
+        time_limit_seconds: null,
+      });
+      mockGetSessionResults.mockRejectedValue(new Error('Ergebnisse konnten nicht geladen werden'));
+      renderPage();
+      const codeInput = screen.getByPlaceholderText('z.B. ABC123');
+      await fireEvent.input(codeInput, { target: { value: 'ABC123' } });
+      await fireEvent.click(screen.getByText('Session laden'));
+      await waitFor(() => {
+        expect(screen.getByText('Ergebnisse konnten nicht geladen werden')).toBeTruthy();
+      });
+    });
+
     it('shows results table when session and results are loaded', async () => {
       mockGetSessionByCode.mockResolvedValue({
         id: 'session-1',
