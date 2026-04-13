@@ -39,6 +39,7 @@
     "vitest": "^4.0.18"
   },
   "dependencies": {
+    "@tauri-apps/api": "^2.10.1",
     "playwright": "^1.58.2",
     "pm2": "^6.0.14",
     "tailwindcss": "^4.2.1"
