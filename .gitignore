@@ -30,3 +30,7 @@ basic-memory/.obsidian
 
 # Git worktrees
 .worktrees
+
+# Tauri
+src-tauri/target/
+src-tauri/WixTools/
