@@ -17,14 +17,16 @@
 
   let { connection }: Props = $props();
 
-  setConnectionContext(connection);
+  $effect(() => {
+    setConnectionContext(connection);
+  });
 
   type Page = 'home' | 'teacher' | 'student';
 
-  let currentPage: Page = 'home';
-  let backendWarning: string = '';
-  let isInitialized: boolean = false;
-  let isBackendAvailable: boolean = false;
+  let currentPage: Page = $state('home');
+  let backendWarning: string = $state('');
+  let isInitialized: boolean = $state(false);
+  let isBackendAvailable: boolean = $state(false);
 
   onMount(() => {
     try {
@@ -71,7 +73,7 @@
   <Layout width="wide">
     <div class="mb-4">
       <button
-        on:click={() => navigate('home')}
+        onclick={() => navigate('home')}
         class="text-sm text-text-muted hover:text-text transition-colors cursor-pointer"
       >
         ← Zurück zur Startseite
