@@ -324,7 +324,9 @@ describe('TypingSession.svelte', () => {
 
       await fireEvent.click(screen.getByText('Nochmal versuchen'));
 
-      expect(screen.queryByText('Ergebnisse')).toBeNull();
+      await waitFor(() => {
+        expect(screen.queryByText('Ergebnisse')).toBeNull();
+      });
     });
 
     it('calls onBack when "Andere Session" is clicked', async () => {
