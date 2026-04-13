@@ -28,9 +28,8 @@ function renderForm(props = {}) {
 
 describe('StudentForm', () => {
   beforeEach(() => {
-    mockGetSessionByCode.mockReset();
-    mockSaveStudentResult.mockReset();
-    mockSaveStudentResult.mockResolvedValue({});
+    mockGetSessionByCode.mockReset(); // keep reset here since each test sets its own return value
+    mockSaveStudentResult.mockClear(); // clear calls only, preserve the default resolved value
     mockOnNavigate.mockReset();
   });
 
