@@ -13,6 +13,7 @@
     "format": "prettier --write .",
     "test": "vitest run --coverage",
     "test:watch": "vitest",
+    "tauri": "tauri",
     "tauri:dev": "tauri dev",
     "tauri:build": "tauri build"
   },
