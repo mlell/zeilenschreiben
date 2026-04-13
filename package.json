@@ -11,7 +11,7 @@
     "check:watch": "svelte-check --tsconfig ./tsconfig.json --watch",
     "lint": "prettier --ignore-path .gitignore --ignore-path .prettierignore --check . && eslint . && svelte-check --tsconfig ./tsconfig.json",
     "format": "prettier --write .",
-    "test": "vitest run",
+    "test": "vitest run --coverage",
     "test:watch": "vitest",
     "tauri:dev": "tauri dev",
     "tauri:build": "tauri build"
