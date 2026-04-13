@@ -3,7 +3,7 @@
  * Tests observable DOM behavior rather than internal component state.
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, fireEvent, screen } from '@testing-library/svelte';
+import { render, fireEvent, screen, waitFor } from '@testing-library/svelte';
 import TypingSession from './TypingSession.svelte';
 import * as connectionContext from '../../connections/connectionContext';
 
@@ -269,6 +269,90 @@ describe('TypingSession.svelte', () => {
 
       await vi.advanceTimersByTimeAsync(1000);
       expect(screen.getByText('0:59')).toBeTruthy();
+    });
+  });
+
+  describe('Save error handling', () => {
+    it('shows error message when persistResult rejects', async () => {
+      const mockPersist = vi.fn().mockRejectedValue(new Error('Netzwerkfehler'));
+      render(TypingSession, {
+        props: {
+          session: mockSession,
+          studentName: 'Test Student',
+          onBack: mockOnBack,
+          persistResult: mockPersist,
+        },
+      });
+
+      for (const char of 'abc') {
+        await fireEvent.keyDown(window, { key: char });
+      }
+      await fireEvent.keyDown(window, { key: 'Enter' });
+      for (const char of 'def') {
+        await fireEvent.keyDown(window, { key: char });
+      }
+      await fireEvent.keyDown(window, { key: 'Enter' });
+
+      await waitFor(() => {
+        expect(screen.getByText('Netzwerkfehler')).toBeTruthy();
+      });
+    });
+
+    it('restarts the session when "Nochmal versuchen" is clicked', async () => {
+      const mockPersist = vi.fn().mockResolvedValue(undefined);
+      render(TypingSession, {
+        props: {
+          session: mockSession,
+          studentName: 'Test Student',
+          onBack: mockOnBack,
+          persistResult: mockPersist,
+        },
+      });
+
+      for (const char of 'abc') {
+        await fireEvent.keyDown(window, { key: char });
+      }
+      await fireEvent.keyDown(window, { key: 'Enter' });
+      for (const char of 'def') {
+        await fireEvent.keyDown(window, { key: char });
+      }
+      await fireEvent.keyDown(window, { key: 'Enter' });
+
+      await waitFor(() => {
+        expect(screen.getByText('Ergebnisse')).toBeTruthy();
+      });
+
+      await fireEvent.click(screen.getByText('Nochmal versuchen'));
+
+      expect(screen.queryByText('Ergebnisse')).toBeNull();
+    });
+
+    it('calls onBack when "Andere Session" is clicked', async () => {
+      const mockPersist = vi.fn().mockResolvedValue(undefined);
+      render(TypingSession, {
+        props: {
+          session: mockSession,
+          studentName: 'Test Student',
+          onBack: mockOnBack,
+          persistResult: mockPersist,
+        },
+      });
+
+      for (const char of 'abc') {
+        await fireEvent.keyDown(window, { key: char });
+      }
+      await fireEvent.keyDown(window, { key: 'Enter' });
+      for (const char of 'def') {
+        await fireEvent.keyDown(window, { key: char });
+      }
+      await fireEvent.keyDown(window, { key: 'Enter' });
+
+      await waitFor(() => {
+        expect(screen.getByText('Ergebnisse')).toBeTruthy();
+      });
+
+      await fireEvent.click(screen.getByText('Andere Session'));
+      expect(mockOnBack).toHaveBeenCalledTimes(1);
     });
   });
 
