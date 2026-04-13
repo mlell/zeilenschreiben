@@ -12,4 +12,4 @@ This page defines standards that all pages of this wiki should follow.
 - **Never include any implementation code** into the wiki
 - **Don't write tables of contents**
 
-Read `memory://ai_assistant_guide` _now_! It has important information about the page format! If you do not have access to basic-memory MCP, visit https://docs.basicmemory.com/reference/ai-assistant-guide.
+Read the MCP resource `memory://ai_assistant_guide` _now_! It has important information about the page format! If you do not have access to basic-memory MCP, visit https://docs.basicmemory.com/reference/ai-assistant-guide.
